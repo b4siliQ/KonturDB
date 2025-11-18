@@ -1,0 +1,117 @@
+package com.monolatte.kontur.model.SQLManager;
+
+import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
+import com.monolatte.kontur.model.SQLManager.Notes.Component;
+
+public class ComponentsManager implements ISQLManager<Component> {
+    final private String _tableName;
+    final private Connection _connect;
+
+    public ComponentsManager(String tableName, Connection connection) {
+        this._tableName = tableName;
+        this._connect = connection;
+    }
+
+    @Override
+    public void createTable() {
+        try (Statement stmt = this._connect.createStatement()) {
+            String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
+                    + "datasheet_link TEXT NOT NULL, price INTEGER NOT NULL)", this._tableName);
+            stmt.execute(sqlRequest);
+            System.out.println("Table " + this._tableName + " created or already exists");
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void dropTable() {
+        try (Statement stmt = this._connect.createStatement()) {
+            String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
+            stmt.execute(sqlRequest);
+            System.out.println("Table " + this._tableName + " dropped");
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void addNote(Component component) {
+        try {
+            String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price) VALUES(?,?,?,?,?)", this._tableName);
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.setString(1, component.getName());
+            pstmt.setString(2, component.getType());
+            pstmt.setString(3, component.getSpecification());
+            pstmt.setString(4, component.getDatasheet_link());
+            pstmt.setInt(5, component.getPrice());
+            pstmt.executeUpdate();
+            System.out.println("Table " + this._tableName + " added");
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteNote(int id) {
+        try {
+            String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Table " + this._tableName + " deleted");
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateNote(Component component) {
+        try {
+            String sqlRequest = String.format("UPDATE %s SET name = ?, type = ?, specification = ?,"
+                    + "datasheet_link = ?, price = ? WHERE id = ?", this._tableName);
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.setString(1, component.getName());
+            pstmt.setString(2, component.getType());
+            pstmt.setString(3, component.getSpecification());
+            pstmt.setString(4, component.getDatasheet_link());
+            pstmt.setInt(5, component.getPrice());
+            pstmt.setInt(6, component.getId());
+            pstmt.executeUpdate();
+            System.out.println("Table " + this._tableName + " updated");
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Component> getAllNotes() {
+        List<Component> notes = new ArrayList<>();
+        String sqlRequest = String.format("SELECT * FROM %s ORDER BY id DESC", this._tableName);
+        try {
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Component component = mapResultSetToComponent(rs);
+                notes.add(component);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return notes;
+    }
+
+    private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
+        Component component = new Component();
+        component.setId(rs.getInt("id"));
+        component.setName(rs.getString("name"));
+        component.setType(rs.getString("type"));
+        component.setSpecification(rs.getString("specification"));
+        component.setDatasheet_link(rs.getString("datasheet_link"));
+        component.setPrice(rs.getInt("price"));
+        return component;
+    }
+}
