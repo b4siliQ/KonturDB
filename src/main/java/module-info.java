@@ -5,6 +5,6 @@ module com.monolatte.kontur {
     requires java.sql;
 
 
-    opens com.monolatte.kontur.view to javafx.fxml;
+    opens com.monolatte.kontur.controllers to javafx.fxml;
     exports com.monolatte.kontur;
 }

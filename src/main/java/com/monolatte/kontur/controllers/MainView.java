@@ -1,12 +1,10 @@
-package com.monolatte.kontur.view;
+package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.ElectComponent;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 
 import java.io.IOException;
 
