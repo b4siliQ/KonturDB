@@ -16,11 +16,12 @@ public class ComponentsManager implements ISQLManager<Component> {
 
     @Override
     public void createTable() {
-        try (Statement stmt = this._connect.createStatement()) {
+        try {
             String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
                     + "datasheet_link TEXT NOT NULL, price INTEGER NOT NULL)", this._tableName);
-            stmt.execute(sqlRequest);
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
@@ -29,9 +30,10 @@ public class ComponentsManager implements ISQLManager<Component> {
 
     @Override
     public void dropTable() {
-        try (Statement stmt = this._connect.createStatement()) {
+        try {
             String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
-            stmt.execute(sqlRequest);
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " dropped");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
