@@ -1,25 +1,35 @@
 package com.monolatte.kontur.model.SQLManager;
 
 public class SQLSuperManager {
-    private final ComponentsManager componentsManager;
-    private final Components_usageManager componentsUsageManager;
-    private final ProjectManager projectManager;
-
-    public SQLSuperManager(ComponentsManager componentsManager, Components_usageManager components_usage_manager, ProjectManager project_manager) {
-        this.componentsManager = componentsManager;
-        this.componentsUsageManager = components_usage_manager;
-        this.projectManager = project_manager;
+    private static class Singleton {
+        private static final SQLSuperManager INSTANCE = new SQLSuperManager();
     }
 
-    public ComponentsManager getComponentsManager() {
-        return componentsManager;
+    private final ComponentsManager _componentsManager;
+    private final Components_usageManager _componentsUsageManager;
+    private final ProjectManager _projectManager;
+
+    private final String _tableName = "KonturDB";
+
+    private SQLSuperManager() {
+        this._componentsManager = new ComponentsManager(this._tableName, SQLConnector.getConnection());
+        this._componentsUsageManager = new Components_usageManager(this._tableName, SQLConnector.getConnection());
+        this._projectManager = new ProjectManager(this._tableName, SQLConnector.getConnection());
+    }
+
+    public ComponentsManager get_componentsManager() {
+        return _componentsManager;
     }
 
     public Components_usageManager getComponentsUsageManager() {
-        return componentsUsageManager;
+        return _componentsUsageManager;
     }
 
     public ProjectManager getProjectManager() {
-        return projectManager;
+        return _projectManager;
+    }
+
+    public static SQLSuperManager getInstance() {
+        return Singleton.INSTANCE;
     }
 }

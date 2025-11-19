@@ -5,8 +5,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class SQLConnector {
-    public String database = "jdbc:sqlite:components.db";
-    public Connection getConnection() {
+    public static String database = "jdbc:sqlite:components.db";
+    public static Connection getConnection() {
         Connection connect = null;
         try {
             connect = DriverManager.getConnection(database);
