@@ -1,23 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.MainView">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.MainView">
    <children>
       <SplitPane dividerPositions="0.35" VBox.vgrow="ALWAYS">
         <items>
@@ -29,16 +17,16 @@
                            <children>
                               <VBox layoutX="45.0" layoutY="71.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ListView fx:id="_compList" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="compList" VBox.vgrow="ALWAYS" />
                                     <Separator VBox.vgrow="ALWAYS" />
                                     <HBox VBox.vgrow="NEVER">
                                        <children>
-                                          <Button fx:id="_addEmptyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onAddEmptyButtonClicked" text="Добавить пустышку" HBox.hgrow="ALWAYS">
+                                          <Button fx:id="addEmptyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onAddEmptyButtonClicked" text="Добавить пустышку" HBox.hgrow="ALWAYS">
                                              <HBox.margin>
                                                 <Insets />
                                              </HBox.margin>
                                           </Button>
-                                          <Button fx:id="_removeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onRemoveButtonClicked" text="Удалить" HBox.hgrow="ALWAYS" />
+                                          <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onRemoveButtonClicked" text="Удалить" HBox.hgrow="ALWAYS" />
                                        </children>
                                        <VBox.margin>
                                           <Insets />
@@ -122,12 +110,12 @@
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <TextField fx:id="_idTextField" editable="false" GridPane.columnIndex="1" />
-                                                            <TextField fx:id="_nameCompTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="_typeTextEdit" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="_costTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="_datasheetPathTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                            <TextArea fx:id="_compInfoTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="idTextField" editable="false" GridPane.columnIndex="1" />
+                                                            <TextField fx:id="nameCompTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="typeTextEdit" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="costTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="datasheetPathTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                            <TextArea fx:id="compInfoTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                          </children>
                                                       </GridPane>
                                                       <VBox VBox.vgrow="NEVER">
@@ -139,8 +127,8 @@
                                                             </HBox>
                                                             <HBox>
                                                                <children>
-                                                                  <Button fx:id="_addCompButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onAddCompButtonClicked" text="Добавить новый компонент" HBox.hgrow="ALWAYS" />
-                                                                  <Button fx:id="_saveDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onSaveDataButtonClicked" text="Сохранить изменения" HBox.hgrow="ALWAYS" />
+                                                                  <Button fx:id="addCompButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onAddCompButtonClicked" text="Добавить новый компонент" HBox.hgrow="ALWAYS" />
+                                                                  <Button fx:id="saveDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#_onSaveDataButtonClicked" text="Сохранить изменения" HBox.hgrow="ALWAYS" />
                                                                </children>
                                                             </HBox>
                                                          </children>
