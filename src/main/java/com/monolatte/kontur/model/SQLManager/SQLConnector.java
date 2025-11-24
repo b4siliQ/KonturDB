@@ -20,6 +20,8 @@ public class SQLConnector {
     }
 
     private static String getDatabasePath() {
+        // ! Если этот блок с проверкой не будет работать, то мы его вырежем!
+        // ! План-капкан: Использовать просто System.getProperty("user.home")
         String appDataPath = System.getenv("APPDATA");
         if (appDataPath == null || appDataPath.isEmpty()) {
             appDataPath = System.getProperty("user.home");
