@@ -1,5 +1,7 @@
 package com.monolatte.kontur.model.SQLManager;
 
+import java.sql.Connection;
+
 public class SQLSuperManager {
     private static class Singleton {
         private static final SQLSuperManager INSTANCE = new SQLSuperManager();
@@ -12,9 +14,11 @@ public class SQLSuperManager {
     private final String _tableName = "KonturDB";
 
     private SQLSuperManager() {
-        this._componentsManager = new ComponentsManager(this._tableName, SQLConnector.getConnection());
-        this._componentsUsageManager = new Components_usageManager(this._tableName, SQLConnector.getConnection());
-        this._projectManager = new ProjectManager(this._tableName, SQLConnector.getConnection());
+        Connection sharedConnection = SQLConnector.getConnection();
+
+        this._componentsManager = new ComponentsManager(this._tableName, sharedConnection);
+        this._componentsUsageManager = new Components_usageManager(this._tableName, sharedConnection);
+        this._projectManager = new ProjectManager(this._tableName, sharedConnection);
     }
 
     public ComponentsManager get_componentsManager() {

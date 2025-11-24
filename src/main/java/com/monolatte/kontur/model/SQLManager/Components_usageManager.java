@@ -100,6 +100,23 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
         return notes;
     }
 
+    public List<Component_usage> getUsageByProjectId(int project_id) {
+        List<Component_usage> notes = new ArrayList<>();
+        String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
+        try {
+            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+            pstmt.setInt(1, project_id);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Component_usage note = mapResultSetToComponent(rs);
+                notes.add(note);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return notes;
+    }
+
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
         Component_usage component_usage = new Component_usage(
         rs.getInt("id"),

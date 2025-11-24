@@ -18,7 +18,7 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     @Override
     public void createTable() {
         try {
-            String sqlRequest = String.format("CREATE TABLE IF NOT EXIST %s(id INTEGER PRIMARY KEY AUTOINCREMENT)"
+            String sqlRequest = String.format("CREATE TABLE IF NOT EXIST %s(id INTEGER PRIMARY KEY AUTOINCREMENT,)"
                     + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL"
                     + "status TEXT NOT NULL)", this._tableName);
             PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
@@ -50,6 +50,7 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
+            pstmt.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -70,12 +71,14 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     @Override
     public void updateNote(Project project) {
         try {
-            String sqlReuqest = String.format("UPDATE %s SET project_name = ?, start_date = ?, end_date = ?, status = ?", this._tableName);
+            String sqlReuqest = String.format("UPDATE %s SET project_name = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?", this._tableName);
             PreparedStatement pstmt = this._connect.prepareStatement(sqlReuqest);
             pstmt.setString(1, project.getProject_name());
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
+            pstmt.setInt(5, project.getId());
+            pstmt.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
