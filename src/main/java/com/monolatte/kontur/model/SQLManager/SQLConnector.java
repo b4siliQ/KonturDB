@@ -21,7 +21,7 @@ public class SQLConnector {
 
     private static String getDatabasePath() {
         String appDataPath = System.getenv("APPDATA");
-        if (appDataPath.isEmpty()) {
+        if (appDataPath == null || appDataPath.isEmpty()) {
             appDataPath = System.getProperty("user.home");
         }
 
@@ -35,7 +35,7 @@ public class SQLConnector {
                 );
             } else {
                 throw new RuntimeException(String.format(
-                        "Warning! Cannot init %s in appdata folder",
+                        "\"Warning! Cannot init %s in appdata folder at path: %s. Check permissions\"",
                         _FOLDERNAME
                 ));
             }
