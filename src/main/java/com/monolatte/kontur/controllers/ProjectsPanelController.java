@@ -149,4 +149,34 @@ public class ProjectsPanelController {
             }
         }
     }
+
+    @FXML
+    public void addEmptyButtonClicked() {
+
+    }
+
+    @FXML
+    public void removeButtonClicked() {
+
+    }
+
+    @FXML
+    public void addInProjectComponentButtonClicked() {
+
+    }
+
+    @FXML
+    public void removeInProjectComponentButtonClicked() {
+
+    }
+
+    @FXML
+    public void addProjectButtonClicked() {
+
+    }
+
+    @FXML
+    public void saveDataButtonClicked() {
+
+    }
 }
