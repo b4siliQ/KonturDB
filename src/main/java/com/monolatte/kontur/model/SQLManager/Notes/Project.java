@@ -17,8 +17,7 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project_usage [id=" + id + ", project_name=" + project_name + ", start_date="
-                + start_date + ", end_date=" + end_date + ", status=" + status + "]";
+        return "Project_usage [project_name=" + project_name + "]";
     }
 
     public int getId() {

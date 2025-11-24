@@ -19,8 +19,7 @@ public class Component {
 
     @Override
     public String toString() {
-        return "Component [id=" + id + ", name=" + name + ", type=" + type + ", specification="
-                + specification + ", datasheet_link=" + datasheet_link + ", price=" + price;
+        return "Component [name=" + name + "]";
     }
 
     public int getId() {
