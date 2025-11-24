@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import com.monolatte.kontur.model.SQLManager.Notes.Project;
 
-public class ProjectManager implements ISQLManager<Project> {
+public class ProjectManager implements ISQLManager<Project>, ISQLManagerSearchable<Project> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -94,6 +94,41 @@ public class ProjectManager implements ISQLManager<Project> {
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
+        }
+        return notes;
+    }
+
+    @Override
+    public List<Project> searcher(int searchType, String searchTerm) {
+        List<Project> notes = new ArrayList<>();
+        String columnName;
+        switch (searchType) {
+            case 1:
+                columnName = "project_name";
+                break;
+            case 2:
+                columnName = "start_date";
+                break;
+            case 3:
+                columnName = "end_date";
+                break;
+            case 4:
+                columnName = "status";
+                break;
+            default:
+                throw new RuntimeException("Invalid search type");
+        }
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setString(1, "%" + searchTerm + "%");
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToProject(rs));
+                }
+            }
+        } catch (SQLException e) {
+            // Логирование и обработка ошибок базы данных
+            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
         }
         return notes;
     }

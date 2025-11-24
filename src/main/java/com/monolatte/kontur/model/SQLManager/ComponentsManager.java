@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.monolatte.kontur.model.SQLManager.Notes.Component;
 
-public class ComponentsManager implements ISQLManager<Component> {
+public class ComponentsManager implements ISQLManager<Component>, ISQLManagerSearchable<Component> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -87,6 +87,52 @@ public class ComponentsManager implements ISQLManager<Component> {
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public List<Component> searcher(int SearchType, String searchTerm) {
+            List<Component> notes = new ArrayList<>();
+            String columnName;
+            switch (SearchType) {
+                case 0:
+                    columnName = "name";
+                    break;
+                case 1:
+                    columnName = "type";
+                    break;
+                case 2:
+                    columnName = "specification";
+                    break;
+                case 3:
+                    columnName = "datasheet_link";
+                    break;
+                case 4:
+                    columnName = "price";
+                    break;
+                default:
+                    throw new RuntimeException("Invalid SearchType");
+            }
+            String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+            try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+                if (SearchType == 4) {
+                    pstmt.setInt(1, Integer.parseInt(searchTerm));
+                }
+                else {
+                    pstmt.setString(1, "%" + searchTerm + "%");
+                }
+                try(ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        notes.add(mapResultSetToComponent(rs));
+                    }
+                }
+            } catch (SQLException e) {
+                // Логирование и обработка ошибок базы данных
+                throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
+            } catch (NumberFormatException e) {
+                // Обработка случая, когда searchTerm для цены не является числом
+                throw new IllegalArgumentException("Цена должна быть числом.", e);
+            }
+        return notes;
     }
 
     @Override
