@@ -6,7 +6,11 @@ public class Component_usage {
     int component_id;
     int quantity;
 
-    public Component_usage() {
+    public Component_usage(int id, int project_id, int component_id, int quantity) {
+        this.id = id;
+        this.project_id = project_id;
+        this.component_id = component_id;
+        this.quantity = quantity;
     }
 
     public int getId() {

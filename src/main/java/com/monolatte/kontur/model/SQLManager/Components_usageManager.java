@@ -101,11 +101,11 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     }
 
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
-        Component_usage component_usage = new Component_usage();
-        component_usage.setId(rs.getInt("id"));
-        component_usage.setProject_id(rs.getInt("project_id"));
-        component_usage.setComponent_id(rs.getInt("component_id"));
-        component_usage.setQuantity(rs.getInt("quantity"));
+        Component_usage component_usage = new Component_usage(
+        rs.getInt("id"),
+        rs.getInt("project_id"),
+        rs.getInt("component_id"),
+        rs.getInt("quantity"));
         return component_usage;
     }
 }

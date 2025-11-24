@@ -99,12 +99,12 @@ public class ProjectManager implements ISQLManager<Project> {
     }
 
     private Project mapResultSetToProject(ResultSet rs) throws SQLException {
-        Project project = new Project();
-        project.setId(rs.getInt("id"));
-        project.setProject_name(rs.getString("project_name"));
-        project.setStart_date(rs.getString("start_date"));
-        project.setEnd_date(rs.getString("end_date"));
-        project.setStatus(rs.getString("status"));
+        Project project = new Project(
+        rs.getInt("id"),
+        rs.getString("project_name"),
+        rs.getString("start_date"),
+        rs.getString("end_date"),
+        rs.getString("status"));
         return project;
     }
 }

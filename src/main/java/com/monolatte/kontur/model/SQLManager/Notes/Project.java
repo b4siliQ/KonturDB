@@ -7,7 +7,12 @@ public class Project {
     private String end_date;
     private String status;
 
-    public Project() {
+    public Project(int id, String project_name, String start_date, String end_date, String status) {
+        this.id = id;
+        this.project_name = project_name;
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.status = status;
     }
 
     public int getId() {

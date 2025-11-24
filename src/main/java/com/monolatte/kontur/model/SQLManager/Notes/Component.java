@@ -8,7 +8,13 @@ public class Component {
     String datasheet_link;
     int price;
 
-    public Component() {
+    public Component(int id, String name, String type, String specification, String datasheet_link, int price) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.specification = specification;
+        this.datasheet_link = datasheet_link;
+        this.price = price;
     }
 
     public int getId() {

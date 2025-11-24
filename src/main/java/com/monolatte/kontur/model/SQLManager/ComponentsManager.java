@@ -107,13 +107,13 @@ public class ComponentsManager implements ISQLManager<Component> {
     }
 
     private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
-        Component component = new Component();
-        component.setId(rs.getInt("id"));
-        component.setName(rs.getString("name"));
-        component.setType(rs.getString("type"));
-        component.setSpecification(rs.getString("specification"));
-        component.setDatasheet_link(rs.getString("datasheet_link"));
-        component.setPrice(rs.getInt("price"));
+        Component component = new Component(
+        rs.getInt("id"),
+        rs.getString("name"),
+        rs.getString("type"),
+        rs.getString("specification"),
+        rs.getString("datasheet_link"),
+        rs.getInt("price"));
         return component;
     }
 }
