@@ -13,6 +13,12 @@ public class Component_usage {
         this.quantity = quantity;
     }
 
+    @Override
+    public String toString() {
+        return "Component_usage [id=" + id + ", project_id=" + project_id + ", component_id="
+                + component_id + ", quantity=" + quantity + "]";
+    }
+
     public int getId() {
         return id;
     }

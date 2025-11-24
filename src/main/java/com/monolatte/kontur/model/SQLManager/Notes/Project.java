@@ -15,6 +15,12 @@ public class Project {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return "Project_usage [id=" + id + ", project_name=" + project_name + ", start_date="
+                + start_date + ", end_date=" + end_date + ", status=" + status + "]";
+    }
+
     public int getId() {
         return id;
     }

@@ -17,6 +17,12 @@ public class Component {
         this.price = price;
     }
 
+    @Override
+    public String toString() {
+        return "Component [id=" + id + ", name=" + name + ", type=" + type + ", specification="
+                + specification + ", datasheet_link=" + datasheet_link + ", price=" + price;
+    }
+
     public int getId() {
         return id;
     }
