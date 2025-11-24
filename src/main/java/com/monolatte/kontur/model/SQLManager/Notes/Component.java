@@ -18,9 +18,7 @@ public class Component {
     }
 
     @Override
-    public String toString() {
-        return "Component [name=" + name + "]";
-    }
+    public String toString() { return this.name; }
 
     public int getId() {
         return id;

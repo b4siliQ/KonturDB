@@ -17,7 +17,7 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project_usage [project_name=" + project_name + "]";
+        return this.project_name;
     }
 
     public int getId() {
