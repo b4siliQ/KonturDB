@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.monolatte.kontur.model.SQLManager.Notes.Component;
 
-public class ComponentsManager implements ISQLManager<Component>, ISQLManagerSearchable<Component> {
+public class ComponentsManager implements ISQLManagerSearchable<Component> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -90,29 +90,17 @@ public class ComponentsManager implements ISQLManager<Component>, ISQLManagerSea
     }
 
     @Override
-    public List<Component> searcher(int SearchType, String searchTerm) {
+    public List<Component> search(int SearchType, String searchTerm) {
             List<Component> notes = new ArrayList<>();
-            String columnName;
-            switch (SearchType) {
-                case 0:
-                    columnName = "name";
-                    break;
-                case 1:
-                    columnName = "type";
-                    break;
-                case 2:
-                    columnName = "specification";
-                    break;
-                case 3:
-                    columnName = "datasheet_link";
-                    break;
-                case 4:
-                    columnName = "price";
-                    break;
-                default:
-                    throw new RuntimeException("Invalid SearchType");
-            }
-            String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+            String columnName = switch (SearchType) {
+                case 0 -> "name";
+                case 1 -> "type";
+                case 2 -> "specification";
+                case 3 -> "datasheet_link";
+                case 4 -> "price";
+                default -> throw new RuntimeException("Invalid SearchType");
+            };
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
             try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
                 if (SearchType == 4) {
                     pstmt.setInt(1, Integer.parseInt(searchTerm));
@@ -153,13 +141,12 @@ public class ComponentsManager implements ISQLManager<Component>, ISQLManagerSea
     }
 
     private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
-        Component component = new Component(
+        return new Component(
         rs.getInt("id"),
         rs.getString("name"),
         rs.getString("type"),
         rs.getString("specification"),
         rs.getString("datasheet_link"),
         rs.getInt("price"));
-        return component;
     }
 }
