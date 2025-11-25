@@ -6,9 +6,9 @@ import com.monolatte.kontur.model.Notes.Project;
 import com.monolatte.kontur.model.SQLManager.ProjectManager;
 import com.monolatte.kontur.model.SQLManager.SQLSuperManager;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+
+import java.util.List;
 
 public class ProjectsPanelController {
     @FXML
@@ -25,7 +25,8 @@ public class ProjectsPanelController {
     TextField startDateTextField;
     @FXML
     TextField endDateTextField;
-    // TODO: Добавить управление элемента для statusChoiceBox
+    @FXML
+    ChoiceBox<String> statusChoiceBox;
     @FXML
     ListView<Component_usage> inprojectComponentsListView;
     @FXML
@@ -42,120 +43,101 @@ public class ProjectsPanelController {
 
     private Project selectedProject = null;
 
-//    @FXML
-//    public void initialize() {
-//    loadProjects();
-//
-//    projectListView.getSelectionModel().selectedItemProperty().addListener(
-//            (obs, oldSelection, newSelection) -> {
-//                if (newSelection != null) {
-//                    showProjectDetails(newSelection);
-//                } else {
-//                    clearProjectDetails();
-//                }
-//            }
-//    );
-//    //TODO: Инициализация statusChoiceBox
-//
-//    }
-//
-//    private void loadProjects() {
-//        try {
-//            projectListView.getItems().setAll(projectManager.getAllNotes());
-//        } catch (Exception e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
-//    }
-//
-//    private void showProjectDetails(Project project) {
-//        idTextField.setText(String.valueOf(project.getId()));
-//        nameTextField.setText(project.getProject_name());
-//        startDateTextField.setText(project.getStart_date());
-//        endDateTextField.setText(project.getEnd_date());
-//
-//        loadComponents(project.getId());
-//    }
-//
-//    private void clearProjectDetails() {
-//        idTextField.clear();
-//        nameTextField.clear();
-//        startDateTextField.clear();
-//        endDateTextField.clear();
-//        // TODO: Очистить statusChoiceBox
-//        inprojectComponentsListView.getItems().clear();
-//    }
-//
-//    private void loadComponents(int projectId) {
-//        try {
-//            List<Component_usage> usage = usageManager.getUsageByProjectId(projectId);
-//            inprojectComponentsListView.getItems().setAll(usage);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
-//    }
-//
-//    @FXML
-//    public void addEmptyProject() {
-//        Project newProject = new Project(0, "Новый проект", "YYYY-MM-DD", "YYYY-MM-DD", "Draft");
-//
-//        projectListView.getItems().add(0, newProject);
-//        projectListView.getSelectionModel().select(0);
-//        nameTextField.requestFocus();
-//    }
-//
-//    @FXML
-//    public void saveProjectData() {
-//        if (this.selectedProject == null) return;
-//
-//        try {
-//            int id = idTextField.getText().isEmpty() ? 0 : Integer.parseInt(idTextField.getText());
-//
-//            this.selectedProject.setId(id);
-//            this.selectedProject.setProject_name(nameTextField.getText());
-//            this.selectedProject.setStart_date(startDateTextField.getText());
-//            this.selectedProject.setEnd_date(endDateTextField.getText());
-//            //this.selectedProject.setStatus(statusChoiceBox.getValue());
-//
-//            if (this.selectedProject.getId() == 0) {
-//                projectManager.addNote(this.selectedProject);
-//            } else {
-//                projectManager.updateNote(this.selectedProject);
-//            }
-//
-//            loadProjects();
-//            projectListView.getSelectionModel().select(this.selectedProject);
-//        } catch (NumberFormatException e) {
-//            // Ошибка, если ID не число
-//            System.err.println("Ошибка ID: " + e.getMessage());
-//        } catch (RuntimeException e) {
-//            // Ошибка SQL
-//            System.err.println("Ошибка сохранения данных: " + e.getMessage());
-//        }
-//    }
-//
-//    @FXML
-//    public void removeProject() {
-//        Project projectToDelete = projectListView.getSelectionModel().getSelectedItem();
-//
-//        if (projectToDelete != null && projectToDelete.getId() > 0) {
-//            try {
-//                projectManager.deleteNote(projectToDelete.getId());
-//                projectListView.getItems().remove(projectToDelete);
-//                clearProjectDetails();
-//            } catch (RuntimeException e) {
-//                System.err.println("Ошибка удаления: " + e.getMessage());
-//            }
-//        }
-//    }
+    @FXML
+    public void initialize() {
+        statusChoiceBox.getItems().addAll("Draft", "In Progress", "Completed", "Canceled");
+
+        loadProjects();
+
+        projectListView.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        showProjectDetails(newSelection);
+                        this.selectedProject = newSelection;
+                    } else {
+                        clearProjectDetails();
+                        this.selectedProject = null;
+                    }
+                }
+        );
+    }
+
+    private void loadProjects() {
+        try {
+            projectListView.getItems().setAll(projectManager.getAllNotes());
+        } catch (Exception e) {
+            System.err.println("Ошибка при загрузке проектов: " + e.getMessage());
+        }
+    }
+
+    private void showProjectDetails(Project project) {
+        idTextField.setText(String.valueOf(project.getId()));
+        nameTextField.setText(project.getProject_name());
+        startDateTextField.setText(project.getStart_date());
+        endDateTextField.setText(project.getEnd_date());
+        statusChoiceBox.setValue(project.getStatus());
+
+        loadComponents(project.getId());
+    }
+
+    private void clearProjectDetails() {
+        idTextField.clear();
+        nameTextField.clear();
+        startDateTextField.clear();
+        endDateTextField.clear();
+        statusChoiceBox.setValue(null);
+        inprojectComponentsListView.getItems().clear();
+    }
+
+    private void loadComponents(int projectId) {
+        try {
+            List<Component_usage> usage = usageManager.getUsageByProjectId(projectId);
+            inprojectComponentsListView.getItems().setAll(usage);
+        } catch (Exception e) {
+            System.err.println("Ошибка при загрузке компонентов проекта: " + e.getMessage());
+        }
+    }
+
+    private Project getProjectFromFields(int currentId) {
+        String name = nameTextField.getText();
+        String startDate = startDateTextField.getText();
+        String endDate = endDateTextField.getText();
+        String status = statusChoiceBox.getValue();
+
+        if (name == null || name.trim().isEmpty() || startDate == null || startDate.trim().isEmpty() || endDate == null || endDate.trim().isEmpty() || status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Все поля проекта должны быть заполнены.");
+        }
+
+        return new Project(currentId, name, startDate, endDate, status);
+    }
 
     @FXML
     public void addEmptyButtonClicked() {
+        Project newProject = new Project(0, "Новый проект", "YYYY-MM-DD", "YYYY-MM-DD", "Draft");
 
+        projectListView.getItems().add(0, newProject);
+        projectListView.getSelectionModel().select(0);
+        nameTextField.requestFocus();
     }
 
     @FXML
     public void removeButtonClicked() {
+        Project projectToRemove = projectListView.getSelectionModel().getSelectedItem();
+        if (projectToRemove != null) {
+            if (projectToRemove.getId() == 0) {
+                projectListView.getItems().remove(projectToRemove);
+                return;
+            }
+        }
 
+        try {
+            projectManager.deleteNote(projectToRemove.getId());
+            projectListView.getItems().remove(projectToRemove);
+            clearProjectDetails();
+        } catch (Exception e) {
+            System.err.println("Ошибка при удалении проекта: " + e.getMessage());
+            new Alert(Alert.AlertType.ERROR, "Ошибка при удалении проекта: " + e.getMessage()).show();
+        }
     }
 
     @FXML
@@ -170,11 +152,44 @@ public class ProjectsPanelController {
 
     @FXML
     public void addProjectButtonClicked() {
+        if (selectedProject == null || selectedProject.getId() != 0) {
+            new Alert(Alert.AlertType.WARNING, "Для добавления нового проекта сначала нажмите 'Добавить пустой' и заполните поля.").show();
+            return;
+        }
 
+        try {
+            Project newProject = getProjectFromFields(0);
+            projectManager.addNote(newProject);
+            projectListView.getItems().remove(selectedProject);
+            projectListView.getItems().add(0, newProject);
+            showProjectDetails(newProject);
+            this.selectedProject = newProject;
+
+        } catch (IllegalArgumentException e) {
+            new Alert(Alert.AlertType.ERROR, "Ошибка: " + e.getMessage()).show();
+        } catch (Exception e) {
+            String errorMessage = "Ошибка при сохранении проекта в БД: " + e.getMessage();
+            System.err.println(errorMessage);
+            new Alert(Alert.AlertType.ERROR, errorMessage).show();
+        }
     }
 
     @FXML
     public void saveDataButtonClicked() {
-
+        try {
+            Project project = getProjectFromFields(selectedProject.getId());
+            projectManager.updateNote(project);
+            int selectedIndex = projectListView.getSelectionModel().getSelectedIndex();
+            projectListView.getItems().set(selectedIndex, project);
+            this.selectedProject = project;
+            clearProjectDetails();
+        } catch (IllegalArgumentException e) {
+            new Alert(Alert.AlertType.ERROR, "Ошибка сохранения: " + e.getMessage()).show();
+        } catch (Exception e) {
+            // Обработка ошибок базы данных
+            String errorMessage = "Ошибка при обновлении данных проекта в БД: " + e.getMessage();
+            System.err.println(errorMessage);
+            new Alert(Alert.AlertType.ERROR, errorMessage).show();
+        }
     }
 }
