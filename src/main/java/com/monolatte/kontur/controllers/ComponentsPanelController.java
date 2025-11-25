@@ -46,7 +46,7 @@ public class ComponentsPanelController {
 
     @FXML
     public void _onAddEmptyButtonClicked() {
-        this._manager.addNote(new Component(0,
+        this._manager.addNote(new Component(
                 "Empty",
                 "Controller",
                 "Specification here!",
