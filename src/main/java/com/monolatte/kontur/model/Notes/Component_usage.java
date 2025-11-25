@@ -2,11 +2,11 @@ package com.monolatte.kontur.model.Notes;
 
 public class Component_usage {
     long id;
-    int project_id;
-    int component_id;
+    long project_id;
+    long component_id;
     int quantity;
 
-    public Component_usage(int project_id, int component_id, int quantity) {
+    public Component_usage(long project_id, long component_id, int quantity) {
         this.project_id = project_id;
         this.component_id = component_id;
         this.quantity = quantity;
@@ -25,19 +25,19 @@ public class Component_usage {
         this.id = id;
     }
 
-    public int getProject_id() {
+    public long getProject_id() {
         return project_id;
     }
 
-    public void setProject_id(int project_id) {
+    public void setProject_id(long project_id) {
         this.project_id = project_id;
     }
 
-    public int getComponent_id() {
+    public long getComponent_id() {
         return component_id;
     }
 
-    public void setComponent_id(int component_id) {
+    public void setComponent_id(long component_id) {
         this.component_id = component_id;
     }
 

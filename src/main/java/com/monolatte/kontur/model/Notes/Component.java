@@ -6,9 +6,9 @@ public class Component {
     String type;
     String specification;
     String datasheet_link;
-    int price;
+    float price;
 
-    public Component(String name, String type, String specification, String datasheet_link, int price) {
+    public Component(String name, String type, String specification, String datasheet_link, float price) {
         this.name = name;
         this.type = type;
         this.specification = specification;
@@ -59,11 +59,11 @@ public class Component {
         this.datasheet_link = datasheet_link;
     }
 
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(float price) {
         this.price = price;
     }
 }
