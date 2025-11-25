@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.monolatte.kontur.model.SQLManager.Notes.Project;
+import com.monolatte.kontur.model.Notes.Project;
 
 public class ProjectManager implements ISQLManagerSearchable<Project> {
     final private String _tableName;
@@ -18,8 +18,8 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     @Override
     public void createTable() {
         try {
-            String sqlRequest = String.format("CREATE TABLE IF NOT EXIST %s(id INTEGER PRIMARY KEY AUTOINCREMENT,)"
-                    + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL"
+            String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL,"
                     + "status TEXT NOT NULL)", this._tableName);
             PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
             pstmt.executeUpdate();
@@ -32,7 +32,7 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     @Override
     public void dropTable() {
         try {
-            String sqlRequest = String.format("DROP TABLE IF EXIST %s;", this._tableName);
+            String sqlRequest = String.format("DROP TABLE IF EXISTS %s;", this._tableName);
             PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " dropped");

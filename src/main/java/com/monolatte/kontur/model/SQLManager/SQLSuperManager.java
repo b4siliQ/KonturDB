@@ -1,6 +1,7 @@
 package com.monolatte.kontur.model.SQLManager;
 
 import java.sql.Connection;
+import java.util.List;
 
 public class SQLSuperManager {
     private static class Singleton {
@@ -10,18 +11,23 @@ public class SQLSuperManager {
     private final ComponentsManager _componentsManager;
     private final Components_usageManager _componentsUsageManager;
     private final ProjectManager _projectManager;
-
-    private final String _tableName = "KonturDB";
+    private final List<ISQLManagerBase> _allManagers;
 
     private SQLSuperManager() {
         Connection sharedConnection = SQLConnector.getConnection();
 
-        this._componentsManager = new ComponentsManager(this._tableName, sharedConnection);
-        this._componentsUsageManager = new Components_usageManager(this._tableName, sharedConnection);
-        this._projectManager = new ProjectManager(this._tableName, sharedConnection);
+        this._componentsManager = new ComponentsManager("Components", sharedConnection);
+        this._componentsUsageManager = new Components_usageManager("Component_Usage", sharedConnection);
+        this._projectManager = new ProjectManager("Projects", sharedConnection);
+
+        _allManagers = List.of(
+                this._componentsManager,
+                this._projectManager,
+                this._componentsUsageManager
+        );
     }
 
-    public ComponentsManager get_componentsManager() {
+    public ComponentsManager getComponentsManager() {
         return _componentsManager;
     }
 
@@ -32,6 +38,8 @@ public class SQLSuperManager {
     public ProjectManager getProjectManager() {
         return _projectManager;
     }
+
+    public List<ISQLManagerBase> getAllManagers() { return this._allManagers; }
 
     public static SQLSuperManager getInstance() {
         return Singleton.INSTANCE;

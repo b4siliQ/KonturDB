@@ -3,7 +3,7 @@ package com.monolatte.kontur.model.SQLManager;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
-import com.monolatte.kontur.model.SQLManager.Notes.Component_usage;
+import com.monolatte.kontur.model.Notes.Component_usage;
 
 public class Components_usageManager implements ISQLManager<Component_usage> {
     final private String _tableName;
@@ -16,11 +16,10 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     @Override
     public void createTable() {
-        try {
-            String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + " project_id INTEGER NOT NULL REFERENCES projects(id), component_id INTEGER NOT NULL REFERENCES components(id),"
-            + "quantity INTEGER NOT NULL)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " project_id INTEGER NOT NULL REFERENCES projects(id), component_id INTEGER NOT NULL REFERENCES components(id),"
+                + "quantity INTEGER NOT NULL)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
         } catch (SQLException e) {
@@ -30,9 +29,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     @Override
     public void dropTable() {
-        try {
-            String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " dropped");
         } catch (SQLException e) {
@@ -42,9 +40,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     @Override
     public void addNote(Component_usage component_usage) {
-        try {
-            String sqlRequest = String.format("INSERT INTO %s (project_id, component_id, quantity) VALUES (?,?,?)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("INSERT INTO %s (project_id, component_id, quantity) VALUES (?,?,?)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setInt(1, component_usage.getProject_id());
             pstmt.setInt(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
@@ -57,9 +54,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     @Override
     public void deleteNote(int id) {
-        try {
-            String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " deleted");
@@ -70,9 +66,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     @Override
     public void updateNote(Component_usage component_usage) {
-        try {
-            String sqlRequest = String.format("UPDATE %s SET project_id=?, component_id=?, quantity=? WHERE id=?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("UPDATE %s SET project_id=?, component_id=?, quantity=? WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setInt(1, component_usage.getProject_id());
             pstmt.setInt(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
@@ -87,9 +82,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     public List<Component_usage> getAllNotes() {
         List<Component_usage> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s", this._tableName);
-        try {
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-            ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Component_usage note = mapResultSetToComponent(rs);
                 notes.add(note);
@@ -103,8 +97,7 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     public List<Component_usage> getUsageByProjectId(int project_id) {
         List<Component_usage> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
-        try {
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setInt(1, project_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -118,11 +111,10 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     }
 
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
-        Component_usage component_usage = new Component_usage(
+        return new Component_usage(
         rs.getInt("id"),
         rs.getInt("project_id"),
         rs.getInt("component_id"),
         rs.getInt("quantity"));
-        return component_usage;
     }
 }

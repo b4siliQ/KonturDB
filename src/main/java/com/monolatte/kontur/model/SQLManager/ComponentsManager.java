@@ -3,7 +3,7 @@ package com.monolatte.kontur.model.SQLManager;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
-import com.monolatte.kontur.model.SQLManager.Notes.Component;
+import com.monolatte.kontur.model.Notes.Component;
 
 public class ComponentsManager implements ISQLManagerSearchable<Component> {
     final private String _tableName;
@@ -16,11 +16,10 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
 
     @Override
     public void createTable() {
-        try {
-            String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
-                    + "datasheet_link TEXT NOT NULL, price INTEGER NOT NULL)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
+                + "datasheet_link TEXT NOT NULL, price INTEGER NOT NULL)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
         } catch (SQLException e) {
@@ -30,9 +29,8 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
 
     @Override
     public void dropTable() {
-        try {
-            String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " dropped");
         } catch (SQLException e) {
@@ -42,9 +40,8 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
 
     @Override
     public void addNote(Component component) {
-        try {
-            String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price) VALUES(?,?,?,?,?)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price) VALUES(?,?,?,?,?)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setString(1, component.getName());
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
@@ -59,9 +56,8 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
 
     @Override
     public void deleteNote(int id) {
-        try {
-            String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " deleted");
@@ -72,10 +68,9 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
 
     @Override
     public void updateNote(Component component) {
-        try {
-            String sqlRequest = String.format("UPDATE %s SET name = ?, type = ?, specification = ?,"
-                    + "datasheet_link = ?, price = ? WHERE id = ?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("UPDATE %s SET name = ?, type = ?, specification = ?,"
+                + "datasheet_link = ?, price = ? WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setString(1, component.getName());
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
@@ -127,9 +122,8 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
     public List<Component> getAllNotes() {
         List<Component> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s ORDER BY id DESC", this._tableName);
-        try {
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-            ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Component component = mapResultSetToComponent(rs);
                 notes.add(component);
