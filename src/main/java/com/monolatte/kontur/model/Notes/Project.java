@@ -1,4 +1,4 @@
-package com.monolatte.kontur.model.SQLManager.Notes;
+package com.monolatte.kontur.model.Notes;
 
 public class Project {
     private int id;
