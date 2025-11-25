@@ -54,16 +54,16 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
                     if (genKeys.next()) {
                         long id = genKeys.getLong(1);
                         project.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id",
+                        System.out.printf("Note has inserted in %s with %d%n id\n",
                                 this._tableName,
                                 id
                         );
                     } else {
-                        System.err.println("Warning! Note has inserted, but without generated id");
+                        System.err.println("Warning! Note has inserted, but without generated id\n");
                     }
                 }
             } else {
-                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());

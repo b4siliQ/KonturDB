@@ -42,8 +42,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     public void addNote(Component_usage component_usage) {
         String sqlRequest = String.format("INSERT INTO %s (project_id, component_id, quantity) VALUES (?,?,?)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, component_usage.getProject_id());
-            pstmt.setInt(2, component_usage.getComponent_id());
+            pstmt.setLong(1, component_usage.getProject_id());
+            pstmt.setLong(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
 
             int affectedRows = pstmt.executeUpdate();
@@ -52,16 +52,16 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
                     if (genKeys.next()) {
                         long id = genKeys.getLong(1);
                         component_usage.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id",
+                        System.out.printf("Note has inserted in %s with %d%n id\n",
                                 this._tableName,
                                 id
                         );
                     } else {
-                        System.err.println("Warning! Note has inserted, but without generated id");
+                        System.err.println("Warning! Note has inserted, but without generated id\n");
                     }
                 }
             } else {
-                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
             }
             System.out.println("Table " + this._tableName + " added");
         } catch (SQLException e) {
@@ -85,8 +85,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     public void updateNote(Component_usage component_usage) {
         String sqlRequest = String.format("UPDATE %s SET project_id=?, component_id=?, quantity=? WHERE id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setInt(1, component_usage.getProject_id());
-            pstmt.setInt(2, component_usage.getComponent_id());
+            pstmt.setLong(1, component_usage.getProject_id());
+            pstmt.setLong(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
             pstmt.setLong(4, component_usage.getId());
             pstmt.executeUpdate();
@@ -115,7 +115,7 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
         List<Component_usage> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setInt(1, project_id);
+            pstmt.setLong(1, project_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 Component_usage note = mapResultSetToComponent(rs);
@@ -129,8 +129,8 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
 
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
         Component_usage componentUsage = new Component_usage(
-        rs.getInt("project_id"),
-        rs.getInt("component_id"),
+        rs.getLong("project_id"),
+        rs.getLong("component_id"),
         rs.getInt("quantity"));
 
         componentUsage.setId(rs.getLong("id"));

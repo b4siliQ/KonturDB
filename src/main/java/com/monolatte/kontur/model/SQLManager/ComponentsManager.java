@@ -18,7 +18,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
     public void createTable() {
         String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
-                + "datasheet_link TEXT NOT NULL, price INTEGER NOT NULL)", this._tableName);
+                + "datasheet_link TEXT NOT NULL, price REAL NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
@@ -46,7 +46,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
-            pstmt.setInt(5, component.getPrice());
+            pstmt.setFloat(5, component.getPrice());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -54,16 +54,16 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
                     if (genKeys.next()) {
                         long id = genKeys.getLong(1);
                         component.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id",
+                        System.out.printf("Note has inserted in %s with %d%n id\n",
                                 this._tableName,
                                 id
                         );
                     } else {
-                        System.err.println("Warning! Note has inserted, but without generated id");
+                        System.err.println("Warning! Note has inserted, but without generated id\n");
                     }
                 }
             } else {
-                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
             }
             // System.out.println("Table " + this._tableName + " added");
         } catch (SQLException e) {
@@ -92,7 +92,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
-            pstmt.setInt(5, component.getPrice());
+            pstmt.setFloat(5, component.getPrice());
             pstmt.setLong(6, component.getId());
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " updated");
@@ -115,7 +115,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
         String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
             try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
                 if (SearchType == 4) {
-                    pstmt.setInt(1, Integer.parseInt(searchTerm));
+                    pstmt.setFloat(1, Integer.parseInt(searchTerm));
                 }
                 else {
                     pstmt.setString(1, "%" + searchTerm + "%");
@@ -157,7 +157,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
         rs.getString("type"),
         rs.getString("specification"),
         rs.getString("datasheet_link"),
-        rs.getInt("price"));
+        rs.getFloat("price"));
 
         component.setId(rs.getLong("id"));
 
