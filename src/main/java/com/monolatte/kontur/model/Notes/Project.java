@@ -1,14 +1,13 @@
 package com.monolatte.kontur.model.Notes;
 
 public class Project {
-    private int id;
+    private long id;
     private String project_name;
     private String start_date;
     private String end_date;
     private String status;
 
-    public Project(int id, String project_name, String start_date, String end_date, String status) {
-        this.id = id;
+    public Project(String project_name, String start_date, String end_date, String status) {
         this.project_name = project_name;
         this.start_date = start_date;
         this.end_date = end_date;
@@ -20,11 +19,11 @@ public class Project {
         return this.project_name;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

@@ -1,15 +1,14 @@
 package com.monolatte.kontur.model.Notes;
 
 public class Component {
-    int id;
+    long id;
     String name;
     String type;
     String specification;
     String datasheet_link;
     int price;
 
-    public Component(int id, String name, String type, String specification, String datasheet_link, int price) {
-        this.id = id;
+    public Component(String name, String type, String specification, String datasheet_link, int price) {
         this.name = name;
         this.type = type;
         this.specification = specification;
@@ -20,11 +19,11 @@ public class Component {
     @Override
     public String toString() { return this.name; }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
