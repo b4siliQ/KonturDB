@@ -2,11 +2,7 @@ package com.monolatte.kontur.model.SQLManager;
 
 import java.util.List;
 
-public interface ISQLManager<T> {
-
-    void createTable();
-
-    void dropTable();
+public interface ISQLManager<T> extends ISQLManagerBase {
 
     void addNote(T note);
 
