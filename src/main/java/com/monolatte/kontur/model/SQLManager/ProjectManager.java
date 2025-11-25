@@ -17,11 +17,10 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
 
     @Override
     public void createTable() {
-        try {
-            String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL,"
-                    + "status TEXT NOT NULL)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL,"
+                + "status TEXT NOT NULL)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
         } catch (Exception e) {
@@ -31,9 +30,8 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
 
     @Override
     public void dropTable() {
-        try {
-            String sqlRequest = String.format("DROP TABLE IF EXISTS %s;", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("DROP TABLE IF EXISTS %s;", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " dropped");
         } catch (Exception e) {
@@ -43,25 +41,40 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
 
     @Override
     public void addNote(Project project) {
-        try {
-            String sqlRequest = String.format("INSERT INTO %s (project_name, start_date, end_date, status) VALUES (?, ?, ?, ?)", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+        String sqlRequest = String.format("INSERT INTO %s (project_name, start_date, end_date, status) VALUES (?, ?, ?, ?)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, project.getProject_name());
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
-            pstmt.executeUpdate();
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet genKeys = pstmt.getGeneratedKeys()) {
+                    if (genKeys.next()) {
+                        long id = genKeys.getLong(1);
+                        project.setId(id);
+                        System.out.printf("Note has inserted in %s with %d%n id",
+                                this._tableName,
+                                id
+                        );
+                    } else {
+                        System.err.println("Warning! Note has inserted, but without generated id");
+                    }
+                }
+            } else {
+                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
     @Override
-    public void deleteNote(int id) {
-        try {
-            String sqlRequest = String.format("DELETE FROM %s WHERE id = ?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-            pstmt.setInt(1, id);
+    public void deleteNote(long id) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, id);
             pstmt.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -70,14 +83,13 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
 
     @Override
     public void updateNote(Project project) {
-        try {
-            String sqlReuqest = String.format("UPDATE %s SET project_name = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?", this._tableName);
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlReuqest);
+        String sqlReuqest = String.format("UPDATE %s SET project_name = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlReuqest)) {
             pstmt.setString(1, project.getProject_name());
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
-            pstmt.setInt(5, project.getId());
+            pstmt.setLong(5, project.getId());
             pstmt.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -88,9 +100,8 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     public List<Project> getAllNotes() {
             List<Project> notes = new ArrayList<>();
             String sqlRequest = String.format("SELECT * FROM %s ORDER BY id DESC", this._tableName);
-        try {
-            PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-            ResultSet rs = pstmt.executeQuery();
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Project project = mapResultSetToProject(rs);
                 notes.add(project);
@@ -127,11 +138,14 @@ public class ProjectManager implements ISQLManagerSearchable<Project> {
     }
 
     private Project mapResultSetToProject(ResultSet rs) throws SQLException {
-        return new Project(
-        rs.getInt("id"),
+        Project project = new Project(
         rs.getString("project_name"),
         rs.getString("start_date"),
         rs.getString("end_date"),
         rs.getString("status"));
+
+        project.setId(rs.getLong("id"));
+
+        return project;
     }
 }

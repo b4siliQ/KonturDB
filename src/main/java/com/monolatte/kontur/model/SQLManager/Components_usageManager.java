@@ -41,11 +41,28 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     @Override
     public void addNote(Component_usage component_usage) {
         String sqlRequest = String.format("INSERT INTO %s (project_id, component_id, quantity) VALUES (?,?,?)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, component_usage.getProject_id());
             pstmt.setInt(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
-            pstmt.executeUpdate();
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet genKeys = pstmt.getGeneratedKeys()) {
+                    if (genKeys.next()) {
+                        long id = genKeys.getLong(1);
+                        component_usage.setId(id);
+                        System.out.printf("Note has inserted in %s with %d%n id",
+                                this._tableName,
+                                id
+                        );
+                    } else {
+                        System.err.println("Warning! Note has inserted, but without generated id");
+                    }
+                }
+            } else {
+                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+            }
             System.out.println("Table " + this._tableName + " added");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
@@ -53,10 +70,10 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     }
 
     @Override
-    public void deleteNote(int id) {
+    public void deleteNote(long id) {
         String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setInt(1, id);
+            pstmt.setLong(1, id);
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " deleted");
         } catch (SQLException e) {
@@ -71,7 +88,7 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
             pstmt.setInt(1, component_usage.getProject_id());
             pstmt.setInt(2, component_usage.getComponent_id());
             pstmt.setInt(3, component_usage.getQuantity());
-            pstmt.setInt(4, component_usage.getId());
+            pstmt.setLong(4, component_usage.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
@@ -111,10 +128,13 @@ public class Components_usageManager implements ISQLManager<Component_usage> {
     }
 
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
-        return new Component_usage(
-        rs.getInt("id"),
+        Component_usage componentUsage = new Component_usage(
         rs.getInt("project_id"),
         rs.getInt("component_id"),
         rs.getInt("quantity"));
+
+        componentUsage.setId(rs.getLong("id"));
+
+        return componentUsage;
     }
 }

@@ -41,24 +41,41 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
     @Override
     public void addNote(Component component) {
         String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price) VALUES(?,?,?,?,?)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, component.getName());
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
             pstmt.setInt(5, component.getPrice());
-            pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " added");
+
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet genKeys = pstmt.getGeneratedKeys()) {
+                    if (genKeys.next()) {
+                        long id = genKeys.getLong(1);
+                        component.setId(id);
+                        System.out.printf("Note has inserted in %s with %d%n id",
+                                this._tableName,
+                                id
+                        );
+                    } else {
+                        System.err.println("Warning! Note has inserted, but without generated id");
+                    }
+                }
+            } else {
+                System.err.printf("Alert! Note hasn't inserted in %s", this._tableName);
+            }
+            // System.out.println("Table " + this._tableName + " added");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
     @Override
-    public void deleteNote(int id) {
+    public void deleteNote(long id) {
         String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setInt(1, id);
+            pstmt.setLong(1, id);
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " deleted");
         } catch (SQLException e) {
@@ -76,7 +93,7 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
             pstmt.setInt(5, component.getPrice());
-            pstmt.setInt(6, component.getId());
+            pstmt.setLong(6, component.getId());
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " updated");
         } catch (SQLException e) {
@@ -135,12 +152,15 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
     }
 
     private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
-        return new Component(
-        rs.getInt("id"),
+        Component component = new Component(
         rs.getString("name"),
         rs.getString("type"),
         rs.getString("specification"),
         rs.getString("datasheet_link"),
         rs.getInt("price"));
+
+        component.setId(rs.getLong("id"));
+
+        return component;
     }
 }
