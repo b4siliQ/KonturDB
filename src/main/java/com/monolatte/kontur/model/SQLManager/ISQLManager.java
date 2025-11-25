@@ -6,7 +6,7 @@ public interface ISQLManager<T> extends ISQLManagerBase {
 
     void addNote(T note);
 
-    void deleteNote(int id);
+    void deleteNote(long id);
 
     void updateNote(T note);
 
