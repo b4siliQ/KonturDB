@@ -23,7 +23,7 @@ public class MainPanelController {
             ));
             Parent subview = componentLoader.load();
             this.componentTab.setContent(subview);
-            this._componentPanelController = componentLoader.getController();
+            //this._componentPanelController = componentLoader.getController();
         } catch (IOException e) {
             System.err.println("Возникла проблема при инициализации вкладки компонентов");
             e.printStackTrace();
