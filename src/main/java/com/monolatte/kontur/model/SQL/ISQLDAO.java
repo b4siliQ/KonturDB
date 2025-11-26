@@ -1,8 +1,8 @@
-package com.monolatte.kontur.model.SQLManager;
+package com.monolatte.kontur.model.SQL;
 
 import java.util.List;
 
-public interface ISQLManager<T> extends ISQLManagerBase {
+public interface ISQLDAO<T> extends ISQLDAOBase {
 
     void addNote(T note);
 
