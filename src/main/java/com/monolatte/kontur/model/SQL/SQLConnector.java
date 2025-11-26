@@ -1,4 +1,4 @@
-package com.monolatte.kontur.model.SQLManager;
+package com.monolatte.kontur.model.SQL;
 
 import java.io.File;
 import java.nio.file.Paths;
