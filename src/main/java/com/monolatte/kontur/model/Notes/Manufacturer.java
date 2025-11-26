@@ -1,12 +1,12 @@
 package com.monolatte.kontur.model.Notes;
 
-public class Produser {
+public class Manufacturer {
     private long id;
     private long component_id;
     private String name;
     private String description;
 
-    public Produser(long component_id, String name, String description) {
+    public Manufacturer(long component_id, String name, String description) {
         this.component_id = component_id;
         this.name = name;
         this.description = description;
