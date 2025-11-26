@@ -1,7 +1,7 @@
 package com.monolatte.kontur;
 
-import com.monolatte.kontur.model.SQLManager.ISQLManagerBase;
-import com.monolatte.kontur.model.SQLManager.SQLSuperManager;
+import com.monolatte.kontur.model.SQL.ISQLDAOBase;
+import com.monolatte.kontur.model.SQL.SQLTableManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -22,8 +22,8 @@ public class StartupApplication extends Application {
     }
 
     private void _initTables() {
-        SQLSuperManager.getInstance().getAllManagers()
-                .forEach(ISQLManagerBase::createTable);
+        SQLTableManager.getInstance().getAllManagers()
+                .forEach(ISQLDAOBase::createTable);
     }
 
     public static void main(String[] args) {
