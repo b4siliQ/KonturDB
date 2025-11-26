@@ -1,17 +1,16 @@
 package com.monolatte.kontur.controllers;
 
-import com.monolatte.kontur.model.SQLManager.ComponentsManager;
+import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
-import com.monolatte.kontur.model.SQLManager.SQLSuperManager;
+import com.monolatte.kontur.model.SQL.SQLTableManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +27,8 @@ public class ComponentsPanelController {
     @FXML
     TextField nameCompTextField;
     @FXML
+    ChoiceBox<String> manufacturerChoiceBox;
+    @FXML
     TextField typeTextEdit;
     @FXML
     TextField costTextField;
@@ -42,7 +43,7 @@ public class ComponentsPanelController {
     @FXML
     Button saveDataButton;
 
-    private final ComponentsManager _manager = SQLSuperManager.getInstance().getComponentsManager();
+    private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
 
     @FXML
     public void initialize() {
@@ -51,7 +52,7 @@ public class ComponentsPanelController {
 
     @FXML
     public void _onAddEmptyButtonClicked() {
-        this._manager.addNote(new Component(
+        this._componentsDAO.addNote(new Component(
                 "Empty Name",
                 "Controller Type",
                 "Enter your specification here!",
@@ -65,7 +66,7 @@ public class ComponentsPanelController {
     public void _onRemoveButtonClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
         if (currentItem == null) { return; }
-        this._manager.deleteNote(currentItem.getId());
+        this._componentsDAO.deleteNote(currentItem.getId());
         this._refreshList();
     }
 
@@ -97,28 +98,35 @@ public class ComponentsPanelController {
 
     @FXML
     public void _onAddCompButtonClicked() {
-        this._manager.addNote(new Component(
+        this._componentsDAO.addNote(new Component(
                 this.nameCompTextField.getText(),
                 this.typeTextEdit.getText(),
                 this.compInfoTextArea.getText(),
                 this.datasheetPathTextField.getText(),
-                Integer.parseInt(this.costTextField.getText())
+                Float.parseFloat(this.costTextField.getText())
         ));
         this._refreshList();
     }
 
-    // ! Исправить проблему с отказом сохранения данных
     @FXML
     public void _onSaveDataButtonClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
         if (currentItem == null) { return; }
-        this._manager.updateNote(currentItem);
+
+        currentItem.setName(this.nameCompTextField.getText());
+        currentItem.setType(this.typeTextEdit.getText());
+        currentItem.setSpecification(this.compInfoTextArea.getText());
+        currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
+        currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
+
+        this._componentsDAO.updateNote(currentItem);
         this._refreshList();
     }
 
     @FXML
     public void onCompListMouseClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
+
         if (currentItem == null) { return; }
         this.idTextField.setText(String.valueOf(currentItem.getId()));
         this.nameCompTextField.setText(currentItem.getName());
@@ -129,11 +137,11 @@ public class ComponentsPanelController {
     }
 
     private ObservableList<Component> _updateList() {
-        return FXCollections.observableList(this._manager.getAllNotes());
+        return FXCollections.observableList(this._componentsDAO.getAllNotes());
     }
 
     private void _refreshList() {
-        ObservableList<Component> notes = this._updateList();
-        this.compList.setItems(notes);
+        var update = this._updateList();
+        this.compList.setItems(update);
     }
 }
