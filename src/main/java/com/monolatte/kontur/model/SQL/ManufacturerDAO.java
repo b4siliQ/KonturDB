@@ -1,17 +1,16 @@
-package com.monolatte.kontur.model.SQLManager;
+package com.monolatte.kontur.model.SQL;
 
-import com.monolatte.kontur.model.Notes.Produser;
-import com.monolatte.kontur.model.Notes.User;
+import com.monolatte.kontur.model.Notes.Manufacturer;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProduserManager implements ISQLManager<Produser> {
+public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
     final private String _tableName;
     final private Connection _connect;
 
-    public ProduserManager(String tableName, Connection connection) {
+    public ManufacturerDAO(String tableName, Connection connection) {
         this._tableName = tableName;
         this._connect = connection;
     }
@@ -41,19 +40,19 @@ public class ProduserManager implements ISQLManager<Produser> {
     }
 
     @Override
-    public void addNote(Produser produser) {
+    public void addNote(Manufacturer manufacturer) {
         String sqlRequest = String.format("INSERT INTO %s (component_id, name, description) VALUES (?,?,?)", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setLong(1, produser.getComponent_id());
-            pstmt.setString(2, produser.getName());
-            pstmt.setString(3, produser.getDescription());
+            pstmt.setLong(1, manufacturer.getComponent_id());
+            pstmt.setString(2, manufacturer.getName());
+            pstmt.setString(3, manufacturer.getDescription());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 try(ResultSet genKeys = pstmt.getGeneratedKeys()) {
                     if (genKeys.next()) {
                         long id = genKeys.getLong(1);
-                        produser.setId(id);
+                        manufacturer.setId(id);
                         System.out.printf("Note has inserted in %s with %d%n id\n",
                                 this._tableName,
                                 id
@@ -82,26 +81,26 @@ public class ProduserManager implements ISQLManager<Produser> {
     }
 
     @Override
-    public void updateNote(Produser produser) {
+    public void updateNote(Manufacturer manufacturer) {
         String sqlRequest = String.format("UPDATE %s SET component_id = ?, name = ?, description = ? WHERE id = ?", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, produser.getComponent_id());
-            pstmt.setString(2, produser.getName());
-            pstmt.setString(3, produser.getDescription());
-            pstmt.setLong(4, produser.getId());
+            pstmt.setLong(1, manufacturer.getComponent_id());
+            pstmt.setString(2, manufacturer.getName());
+            pstmt.setString(3, manufacturer.getDescription());
+            pstmt.setLong(4, manufacturer.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
 
     @Override
-    public List<Produser> getAllNotes() {
-        List<Produser> notes = new ArrayList<>();
+    public List<Manufacturer> getAllNotes() {
+        List<Manufacturer> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Produser note = mapResultSetToProduser(rs);
+                Manufacturer note = mapResultSetToProduser(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -110,14 +109,14 @@ public class ProduserManager implements ISQLManager<Produser> {
         return notes;
     }
 
-    public List<Produser> getUsageByComponentId(long component_id) {
-        List<Produser> notes = new ArrayList<>();
+    public List<Manufacturer> getUsageByComponentId(long component_id) {
+        List<Manufacturer> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s WHERE component_id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, component_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Produser note = mapResultSetToProduser(rs);
+                Manufacturer note = mapResultSetToProduser(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -126,13 +125,13 @@ public class ProduserManager implements ISQLManager<Produser> {
         return notes;
     }
 
-    private Produser mapResultSetToProduser(ResultSet rs) throws SQLException {
-        Produser produser = new Produser(
+    private Manufacturer mapResultSetToProduser(ResultSet rs) throws SQLException {
+        Manufacturer manufacturer = new Manufacturer(
                 rs.getLong("project_id"),
                 rs.getString("name"),
                 rs.getString("description"));
 
-        produser.setId(rs.getLong("id"));
-        return produser;
+        manufacturer.setId(rs.getLong("id"));
+        return manufacturer;
     }
 }

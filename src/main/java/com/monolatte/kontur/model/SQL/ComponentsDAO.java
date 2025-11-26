@@ -1,15 +1,15 @@
-package com.monolatte.kontur.model.SQLManager;
+package com.monolatte.kontur.model.SQL;
 
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.monolatte.kontur.model.Notes.Component;
 
-public class ComponentsManager implements ISQLManagerSearchable<Component> {
+public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     final private String _tableName;
     final private Connection _connect;
 
-    public ComponentsManager(String tableName, Connection connection) {
+    public ComponentsDAO(String tableName, Connection connection) {
         this._tableName = tableName;
         this._connect = connection;
     }
@@ -65,7 +65,6 @@ public class ComponentsManager implements ISQLManagerSearchable<Component> {
             } else {
                 System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
             }
-            // System.out.println("Table " + this._tableName + " added");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }

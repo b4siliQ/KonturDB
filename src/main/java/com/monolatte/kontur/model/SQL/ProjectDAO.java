@@ -1,4 +1,4 @@
-package com.monolatte.kontur.model.SQLManager;
+package com.monolatte.kontur.model.SQL;
 
 import java.sql.*;
 import java.util.List;
@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 import com.monolatte.kontur.model.Notes.Project;
 
-public class ProjectManager implements ISQLManagerSearchable<Project> {
+public class ProjectDAO implements ISQLDAOSearchable<Project> {
     final private String _tableName;
     final private Connection _connect;
 
-    ProjectManager(String _tableName, Connection _connect) {
+    ProjectDAO(String _tableName, Connection _connect) {
         this._tableName = _tableName;
         this._connect = _connect;
     }
