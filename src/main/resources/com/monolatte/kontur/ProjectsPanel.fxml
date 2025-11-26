@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.ProjectsPanelController">
+<VBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.ProjectsPanelController">
    <children>
       <SplitPane dividerPositions="0.29797979797979796" VBox.vgrow="ALWAYS">
         <items>
@@ -16,7 +28,7 @@
                            <children>
                               <VBox layoutX="37.0" layoutY="66.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ListView fx:id="projectListView" VBox.vgrow="ALWAYS" />
+                                    <ListView fx:id="projectListView" onMouseClicked="#_onProjectListViewMouseClicked" VBox.vgrow="ALWAYS" />
                                     <Separator VBox.vgrow="ALWAYS" />
                                     <HBox VBox.vgrow="NEVER">
                                        <children>
@@ -60,12 +72,13 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
-                                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                                            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                          <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                          <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints minHeight="10.0" vgrow="NEVER" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID Проекта">
@@ -78,32 +91,32 @@
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата начала проекта  " GridPane.rowIndex="2">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата начала проекта  " GridPane.rowIndex="3">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата конца проекта" GridPane.rowIndex="3">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата конца проекта" GridPane.rowIndex="4">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Статус проекта" GridPane.rowIndex="4">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Статус проекта" GridPane.rowIndex="5">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Компоненты" GridPane.rowIndex="5">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Компоненты" GridPane.rowIndex="6">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
                                                             <TextField fx:id="idTextField" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
                                                             <TextField fx:id="nameTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="startDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="endDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <ChoiceBox fx:id="statusChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                            <TextField fx:id="startDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="endDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <ChoiceBox fx:id="statusChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
                                                                <children>
                                                                   <ListView fx:id="inprojectComponentsListView" VBox.vgrow="ALWAYS" />
                                                                   <HBox VBox.vgrow="NEVER">
@@ -114,8 +127,15 @@
                                                                   </HBox>
                                                                </children>
                                                             </VBox>
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Пользователь" GridPane.rowIndex="2">
+                                                               <font>
+                                                                  <Font size="14.0" />
+                                                               </font>
+                                                            </Label>
+                                                            <ChoiceBox fx:id="userChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                          </children>
                                                       </GridPane>
+                                                      <Separator prefWidth="200.0" />
                                                       <HBox VBox.vgrow="NEVER">
                                                          <children>
                                                             <Button fx:id="addProjectButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addProjectButtonClicked" text="Добавить новый проект" HBox.hgrow="ALWAYS" />
