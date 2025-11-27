@@ -17,8 +17,13 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " project_id INTEGER NOT NULL REFERENCES projects(id), user_id INTEGER NOT NULL REFERENCES user(id))", this._tableName);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "project_id INTEGER NOT NULL, "
+                + "user_id INTEGER NOT NULL, "
+                + "FOREIGN KEY(project_id) REFERENCES Projects(id) ON DELETE CASCADE, "
+                + "FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE CASCADE)",
+                this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");

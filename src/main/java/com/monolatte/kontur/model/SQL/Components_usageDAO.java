@@ -20,8 +20,12 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " project_id INTEGER NOT NULL REFERENCES projects(id), component_id INTEGER NOT NULL REFERENCES components(id),"
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "project_id INTEGER NOT NULL, "
+                + "component_id INTEGER NOT NULL, "
+                + "FOREIGN KEY(project_id) REFERENCES Projects(id) ON DELETE CASCADE, "
+                + "FOREIGN KEY(component_id) REFERENCES Components(id) ON DELETE CASCADE, "
                 + "quantity INTEGER NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
