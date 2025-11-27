@@ -6,8 +6,7 @@ public class User {
     private String name;
     String description;
 
-    public User(long project_id, String name, String description) {
-        this.project_id = project_id;
+    public User(String name, String description) {
         this.name = name;
         this.description = description;
     }

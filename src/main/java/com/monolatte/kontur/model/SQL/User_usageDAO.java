@@ -1,12 +1,12 @@
 package com.monolatte.kontur.model.SQL;
 
-import com.monolatte.kontur.model.Notes.User_usage;
+import com.monolatte.kontur.model.Notes.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User_usageDAO implements ISQLDAO<User_usage> {
+public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -109,20 +109,101 @@ public class User_usageDAO implements ISQLDAO<User_usage> {
         return notes;
     }
 
-    public List<User_usage> getUsageByProjectId(long project_id) {
+    @Override
+    public List<User_usage> search(int searchType, String searchTerm) {
         List<User_usage> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, project_id);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                User_usage note = mapResultSetToUser(rs);
-                notes.add(note);
+
+        long idToSearch;
+        try {
+            idToSearch = Long.parseLong(searchTerm);
+        } catch (NumberFormatException e) {
+            System.err.println("Ошибка: Для поиска по ID введите число. Получено: " + searchTerm);
+            return notes;
+        }
+
+        String columnName = switch (searchType) {
+            case 1 -> "project_id";
+            case 2 -> "user_id";
+            case 3 -> "id";
+            default -> throw new RuntimeException("Invalid search type");
+        };
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, idToSearch);
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToUser(rs));
+                }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            // Логирование и обработка ошибок базы данных
+            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
         }
         return notes;
+    }
+
+    public List<Project> getProjectsByUserId(long userId) {
+        List<Project> manufacturers = new ArrayList<>();
+        String sqlRequest = String.format(
+                "SELECT p.* FROM Projects p " +
+                        "INNER JOIN %s mu ON p.id = mu.project_id " +
+                        "WHERE mu.user_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    Project project = new Project(
+                            //rs.getLong("project_id"),
+                            rs.getString("name"),
+                            rs.getString("start_date"),
+                            rs.getString("end_date"),
+                            rs.getString("status"));
+
+                    project.setId(rs.getLong("id"));
+                    manufacturers.add(project);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении проекта для пользователей: " + e.getMessage(), e);
+        }
+
+        return manufacturers;
+    }
+
+
+    public List<User> getUsersByProjectId(long projectId) {
+        List<User> users = new ArrayList<>();
+        String sqlRequest = String.format(
+                "SELECT u.* FROM Users u " +
+                        "INNER JOIN %s mu ON u.id = mu.user_id " +
+                        "WHERE mu.project_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, projectId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    User user = new User(
+                            rs.getString("name"),
+                            rs.getString("description"));
+
+                    user.setId(rs.getLong("id"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении пользователей для проекта: " + e.getMessage(), e);
+        }
+
+        return users;
     }
 
     private User_usage mapResultSetToUser(ResultSet rs) throws SQLException {

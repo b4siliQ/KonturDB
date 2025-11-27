@@ -3,12 +3,13 @@ package com.monolatte.kontur.model.SQL;
 import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
+import com.monolatte.kontur.model.Notes.Project;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
+public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usage> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -132,6 +133,39 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
         return notes;
     }
 
+    @Override
+    public List<Manufacturer_Usage> search(int searchType, String searchTerm) {
+        List<Manufacturer_Usage> notes = new ArrayList<>();
+
+        long idToSearch;
+        try {
+            idToSearch = Long.parseLong(searchTerm);
+        } catch (NumberFormatException e) {
+            System.err.println("Ошибка: Для поиска по ID введите число. Получено: " + searchTerm);
+            return notes;
+        }
+
+        String columnName = switch (searchType) {
+            case 1 -> "component_id";
+            case 2 -> "manufacturer_id";
+            case 3 -> "id";
+            default -> throw new RuntimeException("Invalid search type");
+        };
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, idToSearch);
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToManufacturerUsage(rs));
+                }
+            }
+        } catch (SQLException e) {
+            // Логирование и обработка ошибок базы данных
+            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
+        }
+        return notes;
+    }
+
     /**
      * Получает список всех производителей, связанных с указанным компонентом.
      * Использует INNER JOIN для объединения таблицы производителей и таблицы связей.
@@ -147,8 +181,8 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
         // 2. 'manufacturer_usage' — это имя вашей связующей таблицы.
         // Если вы назвали её иначе в Manufacturer_usageDAO, поменяйте имя здесь!
         String sqlRequest = String.format(
-                "SELECT m.* FROM %s m " +
-                        "INNER JOIN manufacturer_usage mu ON m.id = mu.manufacturer_id " +
+                "SELECT m.* FROM Manufacturers m " +
+                        "INNER JOIN %s mu ON m.id = mu.manufacturer_id " +
                         "WHERE mu.component_id = ?",
                 this._tableName
         );
@@ -189,8 +223,8 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
         // 1. this._tableName — это таблица компонентов (например, 'components')
         // 2. 'manufacturer_usage' — это имя вашей связующей таблицы.
         String sqlRequest = String.format(
-                "SELECT c.* FROM %s c " +
-                        "INNER JOIN manufacturer_usage mu ON c.id = mu.component_id " +
+                "SELECT c.* FROM Components c " +
+                        "INNER JOIN %s mu ON c.id = mu.component_id " +
                         "WHERE mu.manufacturer_id = ?",
                 this._tableName
         );

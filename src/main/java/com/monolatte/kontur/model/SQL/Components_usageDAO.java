@@ -3,7 +3,11 @@ package com.monolatte.kontur.model.SQL;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
+
+import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Component_usage;
+import com.monolatte.kontur.model.Notes.Manufacturer;
+import com.monolatte.kontur.model.Notes.Project;
 
 public class Components_usageDAO implements ISQLDAO<Component_usage> {
     final private String _tableName;
@@ -125,6 +129,77 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
             throw new RuntimeException(e.getMessage());
         }
         return notes;
+    }
+
+    public List<Project> getProjectsByComponentId(long componentId) {
+        List<Project> manufacturers = new ArrayList<>();
+        String sqlRequest = String.format(
+                "SELECT p.* FROM Projects p " +
+                        "INNER JOIN %s mu ON p.id = mu.project_id " +
+                        "WHERE mu.component_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, componentId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    Project project = new Project(
+                            //rs.getLong("project_id"),
+                            rs.getString("name"),
+                            rs.getString("start_date"),
+                            rs.getString("end_date"),
+                            rs.getString("status"));
+
+                    project.setId(rs.getLong("id"));
+                    manufacturers.add(project);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении проекта для компонента: " + e.getMessage(), e);
+        }
+
+        return manufacturers;
+    }
+
+
+    public List<Component> getComponentsByProjectId(long projectId) {
+        List<Component> components = new ArrayList<>();
+
+        // ВАЖНО:
+        // 1. this._tableName — это таблица компонентов (например, 'components')
+        // 2. 'manufacturer_usage' — это имя вашей связующей таблицы.
+        String sqlRequest = String.format(
+                "SELECT c.* FROM Components c " +
+                        "INNER JOIN %s mu ON c.id = mu.component_id " +
+                        "WHERE mu.project_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, projectId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    Component component = new Component(
+                            rs.getString("name"),
+                            rs.getString("type"),
+                            rs.getString("specification"),
+                            rs.getString("datasheet_link"),
+                            rs.getFloat("price"));
+
+                    component.setId(rs.getLong("id"));
+                    components.add(component);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении компонентов для проекта: " + e.getMessage(), e);
+        }
+
+        return components;
     }
 
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
