@@ -127,7 +127,6 @@ public class UserDAO implements ISQLDAO<User> {
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User(
-                rs.getLong("project_id"),
                 rs.getString("name"),
                 rs.getString("description"));
 
