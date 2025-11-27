@@ -17,9 +17,10 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " component_id INTEGER NOT NULL REFERENCES components(id),"
-                + "name TEXT NOT NULL, description TEXT NOT NULL)", this._tableName);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "name TEXT NOT NULL, "
+                + "description TEXT NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
@@ -41,11 +42,10 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
 
     @Override
     public void addNote(Manufacturer manufacturer) {
-        String sqlRequest = String.format("INSERT INTO %s (component_id, name, description) VALUES (?,?,?)", this._tableName);
+        String sqlRequest = String.format("INSERT INTO %s (name, description) VALUES (?,?)", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setLong(1, manufacturer.getComponent_id());
-            pstmt.setString(2, manufacturer.getName());
-            pstmt.setString(3, manufacturer.getDescription());
+            pstmt.setString(1, manufacturer.getName());
+            pstmt.setString(2, manufacturer.getDescription());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -100,7 +100,7 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Manufacturer note = mapResultSetToProduser(rs);
+                Manufacturer note = mapResultSetToManufacturer(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -116,7 +116,7 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
             pstmt.setLong(1, component_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Manufacturer note = mapResultSetToProduser(rs);
+                Manufacturer note = mapResultSetToManufacturer(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -125,9 +125,9 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
         return notes;
     }
 
-    private Manufacturer mapResultSetToProduser(ResultSet rs) throws SQLException {
+    private Manufacturer mapResultSetToManufacturer(ResultSet rs) throws SQLException {
         Manufacturer manufacturer = new Manufacturer(
-                rs.getLong("project_id"),
+                //rs.getLong("project_id"),
                 rs.getString("name"),
                 rs.getString("description"));
 

@@ -6,8 +6,7 @@ public class Manufacturer {
     private String name;
     private String description;
 
-    public Manufacturer(long component_id, String name, String description) {
-        this.component_id = component_id;
+    public Manufacturer(String name, String description) {
         this.name = name;
         this.description = description;
     }

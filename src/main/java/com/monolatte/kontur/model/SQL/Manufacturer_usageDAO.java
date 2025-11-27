@@ -1,8 +1,8 @@
 package com.monolatte.kontur.model.SQL;
 
+import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
-import com.monolatte.kontur.model.Notes.User_usage;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,8 +19,13 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " component_id INTEGER NOT NULL REFERENCES projects(id), user_id INTEGER NOT NULL REFERENCES user(id))", this._tableName);
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
+                        + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + "component_id INTEGER NOT NULL, "
+                        + "manufacturer_id INTEGER NOT NULL, "
+                        + "FOREIGN KEY(component_id) REFERENCES Components(id) ON DELETE CASCADE, "
+                        + "FOREIGN KEY(manufacturer_id) REFERENCES Manufacturers(id) ON DELETE CASCADE)",
+                this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
@@ -102,7 +107,7 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                Manufacturer_Usage note = mapResultSetToManufacturer(rs);
+                Manufacturer_Usage note = mapResultSetToManufacturerUsage(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -113,12 +118,12 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
 
     public List<Manufacturer_Usage> getUsageByComponentId(long component_id) {
         List<Manufacturer_Usage> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
+        String sqlRequest = String.format("SELECT * FROM %s WHERE component_id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, component_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                Manufacturer_Usage note = mapResultSetToManufacturer(rs);
+                Manufacturer_Usage note = mapResultSetToManufacturerUsage(rs);
                 notes.add(note);
             }
         } catch (SQLException e) {
@@ -127,7 +132,94 @@ public class Manufacturer_usageDAO implements ISQLDAO<Manufacturer_Usage> {
         return notes;
     }
 
-    private Manufacturer_Usage mapResultSetToManufacturer(ResultSet rs) throws SQLException {
+    /**
+     * Получает список всех производителей, связанных с указанным компонентом.
+     * Использует INNER JOIN для объединения таблицы производителей и таблицы связей.
+     *
+     * @param componentId ID компонента, для которого ищем производителей
+     * @return Список объектов Manufacturer
+     */
+    public List<Manufacturer> getManufacturersByComponentId(long componentId) {
+        List<Manufacturer> manufacturers = new ArrayList<>();
+
+        // ВАЖНО:
+        // 1. this._tableName — это таблица производителей (например, 'manufacturers')
+        // 2. 'manufacturer_usage' — это имя вашей связующей таблицы.
+        // Если вы назвали её иначе в Manufacturer_usageDAO, поменяйте имя здесь!
+        String sqlRequest = String.format(
+                "SELECT m.* FROM %s m " +
+                        "INNER JOIN manufacturer_usage mu ON m.id = mu.manufacturer_id " +
+                        "WHERE mu.component_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, componentId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    Manufacturer manufacturer = new Manufacturer(
+                            //rs.getLong("project_id"),
+                            rs.getString("name"),
+                            rs.getString("description"));
+
+                    manufacturer.setId(rs.getLong("id"));
+                    manufacturers.add(manufacturer);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении производителей для компонента: " + e.getMessage(), e);
+        }
+
+        return manufacturers;
+    }
+
+    /**
+     * Получает список всех компонентов, связанных с указанным производителем.
+     * Использует INNER JOIN для объединения таблицы компонентов и таблицы связей.
+     *
+     * @param manufacturerId ID производителя, для которого ищем компоненты
+     * @return Список объектов Component
+     */
+    public List<Component> getComponentsByManufacturerId(long manufacturerId) {
+        List<Component> components = new ArrayList<>();
+
+        // ВАЖНО:
+        // 1. this._tableName — это таблица компонентов (например, 'components')
+        // 2. 'manufacturer_usage' — это имя вашей связующей таблицы.
+        String sqlRequest = String.format(
+                "SELECT c.* FROM %s c " +
+                        "INNER JOIN manufacturer_usage mu ON c.id = mu.component_id " +
+                        "WHERE mu.manufacturer_id = ?",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, manufacturerId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Используем ваш существующий метод маппинга
+                    Component component = new Component(
+                            rs.getString("name"),
+                            rs.getString("type"),
+                            rs.getString("specification"),
+                            rs.getString("datasheet_link"),
+                            rs.getFloat("price"));
+
+                    component.setId(rs.getLong("id"));
+                    components.add(component);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении компонентов для производителя: " + e.getMessage(), e);
+        }
+
+        return components;
+    }
+
+    private Manufacturer_Usage mapResultSetToManufacturerUsage(ResultSet rs) throws SQLException {
         Manufacturer_Usage componentUsage = new Manufacturer_Usage(
                 rs.getLong("component_id"),
                 rs.getLong("manufacturer_id"));
