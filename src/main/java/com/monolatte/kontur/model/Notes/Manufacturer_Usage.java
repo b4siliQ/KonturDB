@@ -5,8 +5,7 @@ public class Manufacturer_Usage {
     long component_id;
     long manufacturer_id;
 
-    public Manufacturer_Usage(long id, long component_id, long manufacturer_id) {
-        this.id = id;
+    public Manufacturer_Usage(long component_id, long manufacturer_id) {
         this.component_id = component_id;
         this.manufacturer_id = manufacturer_id;
     }

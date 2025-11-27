@@ -5,8 +5,7 @@ public class User_usage {
     long project_id;
     long user_id;
 
-    public User_usage(long id, long project_id, long user_id) {
-        this.id = id;
+    public User_usage(long project_id, long user_id) {
         this.project_id = project_id;
         this.user_id = user_id;
     }
