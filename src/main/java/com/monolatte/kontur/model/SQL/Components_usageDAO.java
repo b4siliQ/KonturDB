@@ -25,8 +25,7 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
                 + "project_id INTEGER NOT NULL, "
                 + "component_id INTEGER NOT NULL, "
                 + "FOREIGN KEY(project_id) REFERENCES Projects(id) ON DELETE CASCADE, "
-                + "FOREIGN KEY(component_id) REFERENCES Components(id) ON DELETE CASCADE, "
-                + "quantity INTEGER NOT NULL)", this._tableName);
+                + "FOREIGN KEY(component_id) REFERENCES Components(id) ON DELETE CASCADE)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
@@ -48,11 +47,10 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
 
     @Override
     public void addNote(Component_usage component_usage) {
-        String sqlRequest = String.format("INSERT INTO %s (project_id, component_id, quantity) VALUES (?,?,?)", this._tableName);
+        String sqlRequest = String.format("INSERT INTO %s (project_id, component_id) VALUES (?,?)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, component_usage.getProject_id());
             pstmt.setLong(2, component_usage.getComponent_id());
-            pstmt.setInt(3, component_usage.getQuantity());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -91,11 +89,10 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
 
     @Override
     public void updateNote(Component_usage component_usage) {
-        String sqlRequest = String.format("UPDATE %s SET project_id=?, component_id=?, quantity=? WHERE id=?", this._tableName);
+        String sqlRequest = String.format("UPDATE %s SET project_id=?, component_id=? WHERE id=?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, component_usage.getProject_id());
             pstmt.setLong(2, component_usage.getComponent_id());
-            pstmt.setInt(3, component_usage.getQuantity());
             pstmt.setLong(4, component_usage.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -209,8 +206,7 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
     private Component_usage mapResultSetToComponent(ResultSet rs) throws SQLException {
         Component_usage componentUsage = new Component_usage(
         rs.getLong("project_id"),
-        rs.getLong("component_id"),
-        rs.getInt("quantity"));
+        rs.getLong("component_id"));
 
         componentUsage.setId(rs.getLong("id"));
 

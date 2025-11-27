@@ -4,12 +4,10 @@ public class Component_usage {
     long id;
     long project_id;
     long component_id;
-    int quantity;
 
-    public Component_usage(long project_id, long component_id, int quantity) {
+    public Component_usage(long project_id, long component_id) {
         this.project_id = project_id;
         this.component_id = component_id;
-        this.quantity = quantity;
     }
 
     @Override
@@ -39,13 +37,5 @@ public class Component_usage {
 
     public void setComponent_id(long component_id) {
         this.component_id = component_id;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 }
