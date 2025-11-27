@@ -2,9 +2,7 @@ package com.monolatte.kontur.model.SQL;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 
 public class SQLConnector {
     private static final String _FOLDERNAME = "KonturSolutions";
@@ -49,6 +47,8 @@ public class SQLConnector {
         Connection connect;
         try {
             connect = DriverManager.getConnection(_databasePath);
+            Statement stmt = connect.createStatement();
+            stmt.execute("PRAGMA foreign_keys = ON;");
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
