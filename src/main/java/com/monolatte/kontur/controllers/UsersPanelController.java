@@ -54,6 +54,7 @@ public class UsersPanelController {
         var currentUser = this.usersListView.getSelectionModel().getSelectedItem();
         if (currentUser == null) { return; }
         this._userDAO.deleteNote(currentUser.getId());
+        this._refreshList();
     }
 
     @FXML

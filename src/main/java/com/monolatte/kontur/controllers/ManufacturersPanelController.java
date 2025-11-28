@@ -51,22 +51,41 @@ public class ManufacturersPanelController {
 
     @FXML
     public void onRemoveButtonClicked() {
-
+        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null) { return; }
+        this._manufacturerDAO.deleteNote(currentManufacturer.getId());
+        this._refreshList();
     }
 
     @FXML
     public void onAddManufacturerButtonClicked() {
-
+        this._manufacturerDAO.addNote(new Manufacturer(
+                this.nameManufacturerTextField.getText(),
+                this.descriptionManufacturerTextArea.getText()
+        ));
+        this._refreshList();
     }
 
     @FXML
     public void onSaveDataButton() {
+        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null) { return; }
 
+        currentManufacturer.setName(nameManufacturerTextField.getText());
+        currentManufacturer.setDescription(descriptionManufacturerTextArea.getText());
+
+        this._manufacturerDAO.updateNote(currentManufacturer);
+        this._refreshList();
     }
 
     @FXML
     public void onManufacturerListViewMouseClicked() {
+        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null) { return; }
 
+        this.idManufacturerTextField.setText(String.valueOf(currentManufacturer.getId()));
+        this.nameManufacturerTextField.setText(currentManufacturer.getName());
+        this.descriptionManufacturerTextArea.setText(currentManufacturer.getDescription());
     }
 
     @FXML
