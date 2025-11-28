@@ -16,7 +16,7 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT," // <-- Добавлен пробел перед (id
                 + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
                 + "datasheet_link TEXT NOT NULL, price REAL NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {

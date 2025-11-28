@@ -47,8 +47,9 @@ public class SQLConnector {
         Connection connect;
         try {
             connect = DriverManager.getConnection(_databasePath);
-            Statement stmt = connect.createStatement();
-            stmt.execute("PRAGMA foreign_keys = ON;");
+            try (Statement stmt = connect.createStatement()) {
+                stmt.execute("PRAGMA foreign_keys = ON;");
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
