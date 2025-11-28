@@ -3,6 +3,7 @@ package com.monolatte.kontur.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 public class UsersPanelController {
@@ -21,7 +22,7 @@ public class UsersPanelController {
     @FXML
     TextField nameUserTextField;
     @FXML
-    TextField descriptionUserTextField;
+    TextArea descriptionUserTextField;
 
     @FXML
     public void onAddEmptyButtonClicked() {
