@@ -2,6 +2,13 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Manufacturer;
+import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
+import com.monolatte.kontur.model.Notes.User;
+import com.monolatte.kontur.model.SQL.ManufacturerDAO;
+import com.monolatte.kontur.model.SQL.Manufacturer_usageDAO;
+import com.monolatte.kontur.model.SQL.SQLTableManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -28,9 +35,18 @@ public class ManufacturersPanelController {
     @FXML
     TextArea descriptionManufacturerTextArea;
 
+    private final ManufacturerDAO _manufacturerDAO = SQLTableManager.getInstance().getManufacturerDAO();
+    private final Manufacturer_usageDAO _manufacturerUsageDAO = SQLTableManager.getInstance().getManufacturerUsageDAO();
+
+    @FXML
+    public void initialize() {
+        this._refreshList();
+    }
+
     @FXML
     public void onAddEmptyButtonClicked() {
-
+        this._manufacturerDAO.addNote(new Manufacturer("new manufacture", "new manufacture"));
+        this._refreshList();
     }
 
     @FXML
@@ -56,5 +72,14 @@ public class ManufacturersPanelController {
     @FXML
     public void onComponentsListViewMouseClicked() {
 
+    }
+
+    private ObservableList<Manufacturer> _updateList() {
+        return FXCollections.observableList(this._manufacturerDAO.getAllNotes());
+    }
+
+    private void _refreshList() {
+        var update = this._updateList();
+        this.manufacturerListView.setItems(update);
     }
 }

@@ -57,7 +57,7 @@ public class SQLTableManager {
 
     public UserDAO getUserDAO() { return _userDAO; }
 
-    public User_usageDAO getuserUsageDAO() { return _userUsageDAO; }
+    public User_usageDAO getUserUsageDAO() { return _userUsageDAO; }
 
     public List<ISQLDAOBase> getAllManagers() { return this._allManagers; }
 
