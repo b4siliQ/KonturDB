@@ -2,7 +2,6 @@ package com.monolatte.kontur.model.Notes;
 
 public class User {
     private long id;
-    private long project_id;
     private String name;
     String description;
 
@@ -17,14 +16,6 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public long getProject_id() {
-        return project_id;
-    }
-
-    public void setProject_id(long project_id) {
-        this.project_id = project_id;
     }
 
     public String getName() {

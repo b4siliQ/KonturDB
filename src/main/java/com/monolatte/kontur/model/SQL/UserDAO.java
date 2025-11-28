@@ -18,7 +18,6 @@ public class UserDAO implements ISQLDAO<User> {
     @Override
     public void createTable() {
         String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " project_id INTEGER NOT NULL REFERENCES projects(id),"
                 + "name TEXT NOT NULL, description TEXT NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
@@ -41,11 +40,10 @@ public class UserDAO implements ISQLDAO<User> {
 
     @Override
     public void addNote(User user) {
-        String sqlRequest = String.format("INSERT INTO %s (project_id, name, description) VALUES (?,?,?)", this._tableName);
+        String sqlRequest = String.format("INSERT INTO %s (name, description) VALUES (?,?)", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setLong(1, user.getProject_id());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getDescription());
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getDescription());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -82,12 +80,11 @@ public class UserDAO implements ISQLDAO<User> {
 
     @Override
     public void updateNote(User user) {
-        String sqlRequest = String.format("UPDATE %s SET project_id = ?, name = ?, description = ? WHERE id = ?", this._tableName);
+        String sqlRequest = String.format("UPDATE %s SET name = ?, description = ? WHERE id = ?", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, user.getProject_id());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getDescription());
-            pstmt.setLong(4, user.getId());
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getDescription());
+            pstmt.setLong(3, user.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -98,22 +95,6 @@ public class UserDAO implements ISQLDAO<User> {
         List<User> notes = new ArrayList<>();
         String sqlRequest = String.format("SELECT * FROM %s", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                User note = mapResultSetToUser(rs);
-                notes.add(note);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        return notes;
-    }
-
-    public List<User> getUsageByProjectId(long project_id) {
-        List<User> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE project_id=?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, project_id);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 User note = mapResultSetToUser(rs);
