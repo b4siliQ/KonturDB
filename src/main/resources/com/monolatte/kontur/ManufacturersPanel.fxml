@@ -15,7 +15,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <HBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.ManufacturersPanelController">
    <children>
       <TitledPane alignment="CENTER" animated="false" maxHeight="1.7976931348623157E308" text="Производители" HBox.hgrow="ALWAYS">
@@ -24,12 +23,12 @@
                <children>
                   <VBox layoutX="141.0" layoutY="149.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <ListView VBox.vgrow="ALWAYS" />
+                        <ListView fx:id="manufacturerListView" onMouseClicked="#onManufacturerListViewMouseClicked" VBox.vgrow="ALWAYS" />
                         <Separator prefWidth="200.0" />
                         <HBox VBox.vgrow="NEVER">
                            <children>
-                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Добавить пустышку" HBox.hgrow="ALWAYS" />
-                              <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Удалить" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="addEmptyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onAddEmptyButtonClicked" text="Добавить пустышку" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRemoveButtonClicked" text="Удалить" HBox.hgrow="ALWAYS" />
                            </children>
                         </HBox>
                      </children>
@@ -45,7 +44,7 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <ListView layoutX="78.0" layoutY="148.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ListView fx:id="componentsListView" layoutX="78.0" layoutY="148.0" onMouseClicked="#onComponentsListViewMouseClicked" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
         </content>
@@ -79,16 +78,16 @@
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text=" ID Производителя " />
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Имя" GridPane.rowIndex="1" />
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Описание" GridPane.rowIndex="2" />
-                                                <TextField GridPane.columnIndex="1" />
-                                                <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <TextArea prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextField fx:id="idManufacturerTextField" editable="false" GridPane.columnIndex="1" />
+                                                <TextField fx:id="nameManufacturerTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <TextArea fx:id="descriptionManufacturerTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                              </children>
                                           </GridPane>
                                           <Separator prefWidth="200.0" />
                                           <HBox VBox.vgrow="NEVER">
                                              <children>
-                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Добавить нового пользователя" HBox.hgrow="ALWAYS" />
-                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Сохранить изменения" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="addManufacturerButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onAddManufacturerButtonClicked" text="Добавить нового производителя" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="saveDataButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onSaveDataButton" text="Сохранить изменения" HBox.hgrow="ALWAYS" />
                                              </children>
                                           </HBox>
                                        </children>
