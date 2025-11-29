@@ -1,7 +1,7 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Component;
-import com.monolatte.kontur.model.Notes.ComponentProperty;
+import com.monolatte.kontur.model.Notes.Properties.ComponentProperty;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.SQL.SQLTableManager;
 import javafx.collections.FXCollections;
