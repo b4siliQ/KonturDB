@@ -83,8 +83,8 @@ public class ComponentsPanelController {
     @FXML
     public void onOpenInTableButton() {
         try {
-            FXMLLoader popupLoader = new FXMLLoader(ManufacturersPanelController.class.getResource(
-                    "/com/monolatte/kontur/DataGridPopup.fxml"
+            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
+                    "/com/monolatte/kontur/ComponentTablePopup.fxml"
             ));
             Parent root = popupLoader.load();
 

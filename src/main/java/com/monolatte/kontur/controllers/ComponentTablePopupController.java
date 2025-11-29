@@ -12,7 +12,7 @@ import javafx.scene.control.TableView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataGridPopupController {
+public class ComponentTablePopupController {
     @FXML
     TableView<ComponentProperty> componentsTable;
     @FXML
@@ -33,24 +33,22 @@ public class DataGridPopupController {
 
     @FXML
     public void initialize() {
-        setupTableColumns();
-        loadDataIntoTable();
+        this._setupTableColumns();
+        this._loadDataIntoTable();
     }
 
-    private void setupTableColumns() {
-        // Привязка свойств (Property) класса Component к столбцам TableView
-        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject()); // asObject() для числовых типов
-        nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
-        specificationColumn.setCellValueFactory(cellData -> cellData.getValue().specificationProperty());
-        datasheetLinkColumn.setCellValueFactory(cellData -> cellData.getValue().datasheetLinkProperty());
-        priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject()); // asObject()
+    private void _setupTableColumns() {
+        this.idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject()); // asObject() для числовых типов
+        this.nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        this.typeColumn.setCellValueFactory(cellData -> cellData.getValue().typeProperty());
+        this.specificationColumn.setCellValueFactory(cellData -> cellData.getValue().specificationProperty());
+        this.datasheetLinkColumn.setCellValueFactory(cellData -> cellData.getValue().datasheetLinkProperty());
+        this.priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject()); // asObject()
     }
 
-    public void loadDataIntoTable() {
-        // Получаем List<Component> из DAO
+    private void _loadDataIntoTable() {
         this._fillComponentPropertyList(this._componentsDAO.getAllNotes());
-        componentsTable.setItems(FXCollections.observableList(this._componentPropertyList));
+        this.componentsTable.setItems(FXCollections.observableList(this._componentPropertyList));
     }
 
     private void _fillComponentPropertyList(List<Component> componentList) {
