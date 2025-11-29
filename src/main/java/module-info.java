@@ -4,6 +4,7 @@ module com.monolatte.kontur {
     requires javafx.graphics;
     requires java.sql;
     requires java.desktop;
+    requires javafx.base;
 
 
     opens com.monolatte.kontur.controllers to javafx.fxml;
