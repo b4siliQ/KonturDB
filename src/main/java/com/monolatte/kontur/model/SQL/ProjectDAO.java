@@ -113,16 +113,9 @@ public class ProjectDAO implements ISQLDAOSearchable<Project> {
     }
 
     @Override
-    public List<Project> search(int searchType, String searchTerm) {
+    public List<Project> search(String columnDescription, String searchTerm) {
         List<Project> notes = new ArrayList<>();
-        String columnName = switch (searchType) {
-            case 1 -> "project_name";
-            case 2 -> "start_date";
-            case 3 -> "end_date";
-            case 4 -> "status";
-            default -> throw new RuntimeException("Invalid search type");
-        };
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setString(1, "%" + searchTerm + "%");
             try(ResultSet rs = pstmt.executeQuery()) {
