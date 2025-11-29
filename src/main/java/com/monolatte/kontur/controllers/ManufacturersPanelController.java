@@ -79,7 +79,7 @@ public class ManufacturersPanelController {
 
     @FXML
     public void onSaveDataButton() {
-        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        var currentManufacturer = this.manufacturerListView.getSelectionModel().getSelectedItem();
         if (currentManufacturer == null) { return; }
 
         currentManufacturer.setName(nameManufacturerTextField.getText());

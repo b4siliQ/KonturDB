@@ -82,12 +82,11 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
 
     @Override
     public void updateNote(Manufacturer manufacturer) {
-        String sqlRequest = String.format("UPDATE %s SET component_id = ?, name = ?, description = ? WHERE id = ?", this._tableName);
+        String sqlRequest = String.format("UPDATE %s SET name = ?, description = ? WHERE id = ?", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, manufacturer.getComponent_id());
-            pstmt.setString(2, manufacturer.getName());
-            pstmt.setString(3, manufacturer.getDescription());
-            pstmt.setLong(4, manufacturer.getId());
+            pstmt.setString(1, manufacturer.getName());
+            pstmt.setString(2, manufacturer.getDescription());
+            pstmt.setLong(3, manufacturer.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }

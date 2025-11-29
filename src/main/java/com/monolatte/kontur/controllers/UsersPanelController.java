@@ -71,8 +71,8 @@ public class UsersPanelController {
         var currentUser = this.usersListView.getSelectionModel().getSelectedItem();
         if (currentUser == null) { return; }
 
-        currentUser.setName(this.nameUserTextField.getText());
-        currentUser.setDescription(this.descriptionUserTextField.getText());
+        currentUser.setName(nameUserTextField.getText());
+        currentUser.setDescription(descriptionUserTextField.getText());
 
         this._userDAO.updateNote(currentUser);
         this._refreshList();
