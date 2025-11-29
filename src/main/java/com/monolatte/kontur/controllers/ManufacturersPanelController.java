@@ -1,6 +1,7 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Component;
+import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
 import com.monolatte.kontur.model.SQL.DAOFactory;
@@ -100,7 +101,7 @@ public class ManufacturersPanelController {
             SearchPopupController<Component> popupController = popupLoader.getController();
 
             popupController.initDAO(DAOFactory.DAOType.COMPONENT);
-            popupController.initData();
+            popupController.initData(ComponentColumns.values());
 
             Stage newStage = new Stage();
             Scene newScene = new Scene(root);
