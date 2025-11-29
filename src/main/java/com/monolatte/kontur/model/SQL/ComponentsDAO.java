@@ -111,6 +111,7 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
 //                else {
 //                    pstmt.setString(1, "%" + searchTerm + "%");
 //                }
+                pstmt.setString(1, "%" + searchTerm + "%");
                 try(ResultSet rs = pstmt.executeQuery()) {
                     while (rs.next()) {
                         notes.add(mapResultSetToComponent(rs));
