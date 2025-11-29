@@ -205,6 +205,26 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         return users;
     }
 
+    public void removeProjectByUserId(long userId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE user_id = ?", this._tableName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeUserByProjectId(long projectId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE project_id = ?", this._tableName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, projectId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private User_usage mapResultSetToUser(ResultSet rs) throws SQLException {
         User_usage componentUsage = new User_usage(
                 rs.getLong("project_id"),
