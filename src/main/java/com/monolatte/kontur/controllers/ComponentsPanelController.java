@@ -8,10 +8,15 @@ import com.monolatte.kontur.model.SQL.SQLTableManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.File;
@@ -26,6 +31,8 @@ public class ComponentsPanelController {
     Button addEmptyButton;
     @FXML
     Button removeButton;
+    @FXML
+    Button openInTableButton;
     @FXML
     TextField idTextField;
     @FXML
@@ -71,6 +78,28 @@ public class ComponentsPanelController {
         if (currentItem == null) { return; }
         this._componentsDAO.deleteNote(currentItem.getId());
         this._refreshList();
+    }
+
+    @FXML
+    public void onOpenInTableButton() {
+        try {
+            FXMLLoader popupLoader = new FXMLLoader(ManufacturersPanelController.class.getResource(
+                    "/com/monolatte/kontur/DataGridPopup.fxml"
+            ));
+            Parent root = popupLoader.load();
+
+            Stage popupStage = new Stage();
+            Scene popupScene = new Scene(root);
+
+            popupStage.setScene(popupScene);
+
+            popupStage.setTitle("Component table");
+            popupStage.setResizable(false);
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
