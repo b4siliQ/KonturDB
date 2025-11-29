@@ -91,7 +91,7 @@
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Описание" GridPane.rowIndex="2" />
                                                 <TextField fx:id="idManufacturerTextField" editable="false" GridPane.columnIndex="1" />
                                                 <TextField fx:id="nameManufacturerTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <TextArea fx:id="descriptionManufacturerTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextArea fx:id="descriptionManufacturerTextArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                              </children>
                                           </GridPane>
                                           <Separator prefWidth="200.0" />
