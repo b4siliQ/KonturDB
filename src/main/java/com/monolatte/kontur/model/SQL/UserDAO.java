@@ -85,6 +85,8 @@ public class UserDAO implements ISQLDAO<User> {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getDescription());
             pstmt.setLong(3, user.getId());
+
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }

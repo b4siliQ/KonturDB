@@ -1,6 +1,7 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Component;
+import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
 import com.monolatte.kontur.model.SQL.DAOFactory;
@@ -92,6 +93,8 @@ public class ManufacturersPanelController {
     @FXML
     public void onPinButtonClicked() {
         var currentManufacturer = this.manufacturerListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null) { return; }
+
         try {
             FXMLLoader popupLoader = new FXMLLoader(ManufacturersPanelController.class.getResource(
                     "/com/monolatte/kontur/SearchPopup.fxml"
@@ -100,7 +103,7 @@ public class ManufacturersPanelController {
             SearchPopupController<Component> popupController = popupLoader.getController();
 
             popupController.initDAO(DAOFactory.DAOType.COMPONENT);
-            popupController.initData();
+            popupController.initData(ComponentColumns.values());
 
             Stage newStage = new Stage();
             Scene newScene = new Scene(root);
@@ -112,7 +115,7 @@ public class ManufacturersPanelController {
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.showAndWait();
 
-            Component result = popupController.getChosenObject();
+            var result = popupController.getChosenObject();
             if (result != null) {
                 this._manufacturerUsageDAO.addNote(new Manufacturer_Usage(
                         result.getId(),
@@ -129,8 +132,15 @@ public class ManufacturersPanelController {
 
     @FXML
     public void onUnpinButtonClicked() {
-        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        var currentManufacturer = this.manufacturerListView.getSelectionModel().getSelectedItem();
+        var currentComponent = this.componentsListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null && currentComponent == null) { return; }
 
+        this._manufacturerUsageDAO.removeComponentByManufacturerId(
+                currentComponent.getId(),
+                currentManufacturer.getId()
+        );
+        this._refreshComponentLists();
     }
 
     @FXML

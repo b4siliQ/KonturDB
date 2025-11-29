@@ -87,6 +87,8 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
             pstmt.setString(1, manufacturer.getName());
             pstmt.setString(2, manufacturer.getDescription());
             pstmt.setLong(3, manufacturer.getId());
+
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }

@@ -1,7 +1,6 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.BaseNote;
-import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Enums.IColumn;
 import com.monolatte.kontur.model.SQL.DAOFactory;
 import com.monolatte.kontur.model.SQL.ISQLDAOSearchable;
@@ -46,7 +45,11 @@ public class SearchPopupController<T extends BaseNote> {
 
     @FXML
     public void onFindButtonClicked() {
-
+        var foundedObjects = FXCollections.observableList(this._DAO.search(
+                this.columnSorterChoiceBox.getValue().getDescription(),
+                this.searchTextField.getText()
+        ));
+        this.resultListView.setItems(foundedObjects);
     }
 
     @FXML
@@ -80,8 +83,11 @@ public class SearchPopupController<T extends BaseNote> {
         this._stage = stage;
     }
 
-    public void initData() {
+    public void initData(IColumn[] columns) {
         this._refreshList();
+        for (var column : columns) {
+            this.columnSorterChoiceBox.getItems().add(column);
+        }
     }
 
     public T getChosenObject() {

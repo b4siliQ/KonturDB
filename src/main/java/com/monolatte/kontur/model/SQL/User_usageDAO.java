@@ -157,8 +157,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
                 while (rs.next()) {
                     // Используем ваш существующий метод маппинга
                     Project project = new Project(
-                            //rs.getLong("project_id"),
-                            rs.getString("name"),
+                            rs.getString("project_name"),
                             rs.getString("start_date"),
                             rs.getString("end_date"),
                             rs.getString("status"));
@@ -205,20 +204,26 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         return users;
     }
 
-    public void removeProjectByUserId(long userId) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE user_id = ?", this._tableName);
+    public void removeProjectByUserId(long projectId, long userId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE project_id = ? AND user_id = ?",
+                this._tableName
+        );
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, userId);
+            pstmt.setLong(1, projectId);
+            pstmt.setLong(2, userId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void removeUserByProjectId(long projectId) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE project_id = ?", this._tableName);
+    public void removeUserByProjectId(long userId, long projectId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE user_id = ? AND project_id = ?",
+                this._tableName
+        );
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, projectId);
+            pstmt.setLong(1, userId);
+            pstmt.setLong(2, projectId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
