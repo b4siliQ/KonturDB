@@ -253,6 +253,26 @@ public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usa
         return components;
     }
 
+    public void removeManufacturerByComponentId(long componentId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE component_id = ?", this._tableName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, componentId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void removeComponentByManufacturerId(long manufacturerId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE manufacturer_id = ?", this._tableName);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, manufacturerId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Manufacturer_Usage mapResultSetToManufacturerUsage(ResultSet rs) throws SQLException {
         Manufacturer_Usage componentUsage = new Manufacturer_Usage(
                 rs.getLong("component_id"),
