@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.monolatte.kontur.model.Notes.Component;
-import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 
 public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     final private String _tableName;
@@ -104,15 +103,14 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     @Override
     public List<Component> search(String columnDescription, String searchTerm) {
             List<Component> notes = new ArrayList<>();
-            String columnName = columnDescription;
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
             try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-                if (SearchType == 4) {
-                    pstmt.setFloat(1, Integer.parseInt(searchTerm));
-                }
-                else {
-                    pstmt.setString(1, "%" + searchTerm + "%");
-                }
+//                if (SearchType == 4) {
+//                    pstmt.setFloat(1, Integer.parseInt(searchTerm));
+//                }
+//                else {
+//                    pstmt.setString(1, "%" + searchTerm + "%");
+//                }
                 try(ResultSet rs = pstmt.executeQuery()) {
                     while (rs.next()) {
                         notes.add(mapResultSetToComponent(rs));
