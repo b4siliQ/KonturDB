@@ -1,7 +1,9 @@
 package com.monolatte.kontur.controllers;
 
+import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
+import com.monolatte.kontur.model.SQL.Manufacturer_usageDAO;
 import com.monolatte.kontur.model.SQL.SQLTableManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,6 +21,8 @@ public class ComponentsPanelController {
     @FXML
     ListView<Component> compList;
     @FXML
+    ListView<Manufacturer> manufacturerListView;
+    @FXML
     Button addEmptyButton;
     @FXML
     Button removeButton;
@@ -26,8 +30,6 @@ public class ComponentsPanelController {
     TextField idTextField;
     @FXML
     TextField nameCompTextField;
-    @FXML
-    ChoiceBox<String> manufacturerChoiceBox;
     @FXML
     TextField typeTextEdit;
     @FXML
@@ -44,6 +46,7 @@ public class ComponentsPanelController {
     Button saveDataButton;
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
+    private final Manufacturer_usageDAO _manufacturerUsageDAO = SQLTableManager.getInstance().getManufacturerUsageDAO();
 
     @FXML
     public void initialize() {
@@ -88,10 +91,8 @@ public class ComponentsPanelController {
                         currentItem.getDatasheet_link());
             }
         } catch (IOException e) {
-            e.printStackTrace();
             System.err.println("An error occurred while trying to open the file");
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             System.err.println("File could not be opened (e.g., no application registered for PDFs).");
         }
     }
@@ -134,6 +135,8 @@ public class ComponentsPanelController {
         this.costTextField.setText(String.valueOf(currentItem.getPrice()));
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());
+
+        this._refreshManufacturerList();
     }
 
     private ObservableList<Component> _updateList() {
@@ -143,5 +146,17 @@ public class ComponentsPanelController {
     private void _refreshList() {
         var update = this._updateList();
         this.compList.setItems(update);
+    }
+
+    private ObservableList<Manufacturer> _updateManufacturerList() {
+        var currentItem = this.compList.getSelectionModel().getSelectedItem();
+        return FXCollections.observableList(this._manufacturerUsageDAO.getManufacturersByComponentId(
+                currentItem.getId()
+        ));
+    }
+
+    private void _refreshManufacturerList() {
+        var update = this._updateManufacturerList();
+        this.manufacturerListView.setItems(update);
     }
 }

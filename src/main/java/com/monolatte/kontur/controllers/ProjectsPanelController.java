@@ -1,15 +1,9 @@
 package com.monolatte.kontur.controllers;
 
-import com.monolatte.kontur.model.Notes.Component;
-import com.monolatte.kontur.model.Notes.Component_usage;
+import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Enums.ProjectStatus;
-import com.monolatte.kontur.model.Notes.Manufacturer_Usage;
-import com.monolatte.kontur.model.SQL.Components_usageDAO;
-import com.monolatte.kontur.model.Notes.Project;
-import com.monolatte.kontur.model.SQL.DAOFactory;
-import com.monolatte.kontur.model.SQL.ProjectDAO;
-import com.monolatte.kontur.model.SQL.SQLTableManager;
+import com.monolatte.kontur.model.SQL.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,6 +20,8 @@ public class ProjectsPanelController {
     @FXML
     ListView<Project> projectListView;
     @FXML
+    ListView<User> userListView;
+    @FXML
     Button addEmptyButton;
     @FXML
     Button removeButton;
@@ -33,8 +29,6 @@ public class ProjectsPanelController {
     TextField idTextField;
     @FXML
     TextField nameTextField;
-    @FXML
-    ChoiceBox<String> userChoiceBox;
     @FXML
     TextField startDateTextField;
     @FXML
@@ -54,6 +48,7 @@ public class ProjectsPanelController {
 
     private final ProjectDAO _projectDAO = SQLTableManager.getInstance().getProjectManager();
     private final Components_usageDAO _componentsUsageDAO = SQLTableManager.getInstance().getComponentsUsageManager();
+    private final User_usageDAO _userUsageDAO = SQLTableManager.getInstance().getUserUsageDAO();
 
     @FXML
     public void initialize() {
@@ -168,6 +163,7 @@ public class ProjectsPanelController {
         this.startDateTextField.setText(currentItem.getStart_date());
         this.endDateTextField.setText(currentItem.getEnd_date());
         this._refreshComponentList();
+        this._refreshUserList();
     }
 
     private ObservableList<Project> _updateMainList() {
@@ -189,5 +185,17 @@ public class ProjectsPanelController {
     private void _refreshComponentList() {
         var update = this._updateComponentList();
         this.inprojectComponentsListView.setItems(update);
+    }
+
+    private ObservableList<User> _updateUserList() {
+        var currentProject = this.projectListView.getSelectionModel().getSelectedItem();
+        return FXCollections.observableList(this._userUsageDAO.getUsersByProjectId(
+                currentProject.getId()
+        ));
+    }
+
+    private void _refreshUserList() {
+        var update = this._updateUserList();
+        this.userListView.setItems(update);
     }
 }
