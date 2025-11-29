@@ -134,7 +134,7 @@ public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usa
     }
 
     @Override
-    public List<Manufacturer_Usage> search(int searchType, String searchTerm) {
+    public List<Manufacturer_Usage> search(String columnDescription, String searchTerm) {
         List<Manufacturer_Usage> notes = new ArrayList<>();
 
         long idToSearch;
@@ -145,13 +145,7 @@ public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usa
             return notes;
         }
 
-        String columnName = switch (searchType) {
-            case 1 -> "component_id";
-            case 2 -> "manufacturer_id";
-            case 3 -> "id";
-            default -> throw new RuntimeException("Invalid search type");
-        };
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnName);
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, idToSearch);
             try(ResultSet rs = pstmt.executeQuery()) {
