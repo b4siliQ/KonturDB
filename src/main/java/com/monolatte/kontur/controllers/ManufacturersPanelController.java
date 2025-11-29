@@ -93,6 +93,8 @@ public class ManufacturersPanelController {
     @FXML
     public void onPinButtonClicked() {
         var currentManufacturer = this.manufacturerListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null) { return; }
+
         try {
             FXMLLoader popupLoader = new FXMLLoader(ManufacturersPanelController.class.getResource(
                     "/com/monolatte/kontur/SearchPopup.fxml"
@@ -113,7 +115,7 @@ public class ManufacturersPanelController {
             newStage.initModality(Modality.APPLICATION_MODAL);
             newStage.showAndWait();
 
-            Component result = popupController.getChosenObject();
+            var result = popupController.getChosenObject();
             if (result != null) {
                 this._manufacturerUsageDAO.addNote(new Manufacturer_Usage(
                         result.getId(),
@@ -130,8 +132,15 @@ public class ManufacturersPanelController {
 
     @FXML
     public void onUnpinButtonClicked() {
-        var currentManufacturer = manufacturerListView.getSelectionModel().getSelectedItem();
+        var currentManufacturer = this.manufacturerListView.getSelectionModel().getSelectedItem();
+        var currentComponent = this.componentsListView.getSelectionModel().getSelectedItem();
+        if (currentManufacturer == null && currentComponent == null) { return; }
 
+        this._manufacturerUsageDAO.removeComponentByManufacturerId(
+                currentComponent.getId(),
+                currentManufacturer.getId()
+        );
+        this._refreshComponentLists();
     }
 
     @FXML
