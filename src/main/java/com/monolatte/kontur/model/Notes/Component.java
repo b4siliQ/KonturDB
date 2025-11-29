@@ -1,7 +1,6 @@
 package com.monolatte.kontur.model.Notes;
 
-public class Component {
-    long id;
+public class Component extends BaseNote {
     String name;
     String type;
     String specification;
@@ -18,14 +17,6 @@ public class Component {
 
     @Override
     public String toString() { return this.name; }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

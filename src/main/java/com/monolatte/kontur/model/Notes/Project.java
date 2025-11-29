@@ -1,7 +1,6 @@
 package com.monolatte.kontur.model.Notes;
 
-public class Project {
-    private long id;
+public class Project extends BaseNote {
     private String project_name;
     private String start_date;
     private String end_date;
@@ -17,14 +16,6 @@ public class Project {
     @Override
     public String toString() {
         return this.project_name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getProject_name() {

@@ -1,21 +1,12 @@
 package com.monolatte.kontur.model.Notes;
 
-public class User_usage {
-    long id;
+public class User_usage extends BaseNote {
     long project_id;
     long user_id;
 
     public User_usage(long project_id, long user_id) {
         this.project_id = project_id;
         this.user_id = user_id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public long getProject_id() {

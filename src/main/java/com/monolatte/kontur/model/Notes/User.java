@@ -1,21 +1,12 @@
 package com.monolatte.kontur.model.Notes;
 
-public class User {
-    private long id;
+public class User extends BaseNote {
     private String name;
     String description;
 
     public User(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {

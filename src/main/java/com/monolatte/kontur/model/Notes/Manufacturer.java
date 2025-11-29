@@ -1,7 +1,6 @@
 package com.monolatte.kontur.model.Notes;
 
-public class Manufacturer {
-    private long id;
+public class Manufacturer extends BaseNote {
     private long component_id;
     private String name;
     private String description;
@@ -9,14 +8,6 @@ public class Manufacturer {
     public Manufacturer(String name, String description) {
         this.name = name;
         this.description = description;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public long getComponent_id() {
