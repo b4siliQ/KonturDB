@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.DataGridPopupController">
+   <children>
+      <TableView fx:id="componentsTable" VBox.vgrow="ALWAYS">
+        <columns>
+          <TableColumn fx:id="idColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="ID" />
+          <TableColumn fx:id="nameColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="Name" />
+            <TableColumn fx:id="typeColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="Type" />
+            <TableColumn fx:id="specificationColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="Specification" />
+            <TableColumn fx:id="datasheetLinkColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="Datasheet" />
+            <TableColumn fx:id="priceColumn" editable="false" maxWidth="1.7976931348623157E308" prefWidth="75.0" text="Price" />
+        </columns>
+      </TableView>
+   </children>
+</VBox>
