@@ -203,20 +203,22 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
         return components;
     }
 
-    public void removeProjectByComponentId(long componentId) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE component_id = ?", this._tableName);
+    public void removeProjectByComponentId(long projectId, long componentId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE project_id = ? AND component_id = ?", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, componentId);
+            pstmt.setLong(1, projectId);
+            pstmt.setLong(2, componentId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void removeComponentByProjectId(long projectId) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE project_id = ?", this._tableName);
+    public void removeComponentByProjectId(long componentId, long projectId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE component_id = ? AND project_id = ?", this._tableName);
         try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, projectId);
+            pstmt.setLong(1, componentId);
+            pstmt.setLong(2, projectId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
