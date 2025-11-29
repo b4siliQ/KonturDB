@@ -26,6 +26,8 @@ public class ProjectsPanelController {
     @FXML
     Button removeButton;
     @FXML
+    Button openInTableButton;
+    @FXML
     TextField idTextField;
     @FXML
     TextField nameTextField;
@@ -73,6 +75,27 @@ public class ProjectsPanelController {
         if (currentItem == null) { return; }
         this._projectDAO.deleteNote(currentItem.getId());
         this._refreshMainList();
+    }
+    @FXML
+    public void onOpenInTableButton() {
+        try {
+            var popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource(
+                    "/com/monolatte/kontur/ProjectTablePopup.fxml"
+            ));
+            Parent root = popupLoader.load();
+
+            Stage popupStage = new Stage();
+            Scene popupScene = new Scene(root);
+
+            popupStage.setScene(popupScene);
+
+            popupStage.setTitle("Project table");
+            popupStage.setResizable(false);
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML

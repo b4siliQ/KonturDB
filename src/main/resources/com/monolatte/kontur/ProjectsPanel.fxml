@@ -30,12 +30,18 @@
                                  <children>
                                     <ListView fx:id="projectListView" onMouseClicked="#_onProjectListViewMouseClicked" VBox.vgrow="ALWAYS" />
                                     <Separator VBox.vgrow="ALWAYS" />
-                                    <HBox VBox.vgrow="NEVER">
+                                    <VBox VBox.vgrow="NEVER">
                                        <children>
-                                          <Button fx:id="addEmptyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addEmptyButtonClicked" text="Добавить пустышку" HBox.hgrow="ALWAYS" />
-                                          <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeButtonClicked" text="Удалить" HBox.hgrow="ALWAYS" />
+                                          <HBox VBox.vgrow="NEVER">
+                                             <children>
+                                                <Button fx:id="addEmptyButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addEmptyButtonClicked" text="Добавить пустышку" HBox.hgrow="ALWAYS" />
+                                                <Button fx:id="removeButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeButtonClicked" text="Удалить" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                          </HBox>
+                                          <Separator prefWidth="200.0" />
+                                          <Button fx:id="openInTableButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onOpenInTableButton" text="Открыть в таблице" VBox.vgrow="ALWAYS" />
                                        </children>
-                                    </HBox>
+                                    </VBox>
                                  </children>
                               </VBox>
                            </children>
