@@ -14,6 +14,11 @@ public enum ProjectColumns implements IColumn {
     }
 
     @Override
+    public String toString() {
+        return this._description;
+    }
+
+    @Override
     public String getDescription() { return this._description; }
 
     public static ProjectColumns getByDescription(String description) {

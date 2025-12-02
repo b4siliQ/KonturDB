@@ -21,15 +21,17 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
           <RowConstraints minHeight="10.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
           <RowConstraints minHeight="10.0" vgrow="NEVER" />
         </rowConstraints>
          <children>
             <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Поисковик" />
-            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text=" Сортировать по колонке " GridPane.rowIndex="1" />
-            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Результат" GridPane.rowIndex="2" />
-            <ListView fx:id="resultListView" onMouseClicked="#onResultListViewClicked" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ChoiceBox fx:id="columnSorterChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text=" Сортировать по колонке " GridPane.rowIndex="2" />
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Результат" GridPane.rowIndex="4" />
+            <ListView fx:id="resultListView" onMouseClicked="#onResultListViewClicked" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <ChoiceBox fx:id="columnSorterChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <HBox prefWidth="200.0" GridPane.columnIndex="1" GridPane.vgrow="NEVER">
                <children>
                   <TextField fx:id="searchTextField" HBox.hgrow="ALWAYS" />

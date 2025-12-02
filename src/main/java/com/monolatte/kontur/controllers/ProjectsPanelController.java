@@ -2,6 +2,7 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
+import com.monolatte.kontur.model.Notes.Enums.ProjectColumns;
 import com.monolatte.kontur.model.Notes.Enums.ProjectStatus;
 import com.monolatte.kontur.model.SQL.*;
 import javafx.collections.FXCollections;
@@ -27,6 +28,14 @@ public class ProjectsPanelController {
     Button removeButton;
     @FXML
     Button openInTableButton;
+    @FXML
+    Button searchButton;
+    @FXML
+    Button resetSearchButton;
+    @FXML
+    ChoiceBox<ProjectColumns> columnSorterChoiceBox;
+    @FXML
+    TextField searchTextField;
     @FXML
     TextField idTextField;
     @FXML
@@ -56,6 +65,7 @@ public class ProjectsPanelController {
     public void initialize() {
         this._refreshMainList();
         this.statusChoiceBox.getItems().addAll(ProjectStatus.values());
+        this.columnSorterChoiceBox.getItems().addAll(ProjectColumns.values());
     }
 
     @FXML
@@ -172,6 +182,21 @@ public class ProjectsPanelController {
         currentItem.setEnd_date(this.endDateTextField.getText());
 
         this._projectDAO.updateNote(currentItem);
+        this._refreshMainList();
+    }
+
+    @FXML
+    public void onSearchButton() {
+        var searchedItem = FXCollections.observableList(this._projectDAO.search(
+                this.columnSorterChoiceBox.getValue().getDescription(),
+                this.searchTextField.getText()
+        ));
+        this.projectListView.setItems(searchedItem);
+    }
+
+    @FXML
+    public void onResetSearchButton() {
+        this.searchTextField.setText("");
         this._refreshMainList();
     }
 

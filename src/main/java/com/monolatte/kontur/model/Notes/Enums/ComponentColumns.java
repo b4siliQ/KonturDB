@@ -13,6 +13,11 @@ public enum ComponentColumns implements IColumn {
     }
 
     @Override
+    public String toString() {
+        return this._description;
+    }
+
+    @Override
     public String getDescription() {
         return this._description;
     }

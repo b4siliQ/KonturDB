@@ -15,8 +15,8 @@ public class StartupApplication extends Application {
         this._initTables();
 
         FXMLLoader fxmlLoader = new FXMLLoader(StartupApplication.class.getResource("MainPanel.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1280, 800);
-        stage.setTitle("Kontur");
+        Scene scene = new Scene(fxmlLoader.load(), 1280, 810);
+        stage.setTitle("KonturDB");
         stage.setScene(scene);
         stage.show();
     }
