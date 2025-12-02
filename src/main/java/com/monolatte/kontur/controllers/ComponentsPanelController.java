@@ -1,5 +1,6 @@
 package com.monolatte.kontur.controllers;
 
+import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
@@ -34,6 +35,14 @@ public class ComponentsPanelController {
     @FXML
     Button openInTableButton;
     @FXML
+    Button searchButton;
+    @FXML
+    Button resetSearchButton;
+    @FXML
+    ChoiceBox<ComponentColumns> columnSorterChoiceBox;
+    @FXML
+    TextField searchTextField;
+    @FXML
     TextField idTextField;
     @FXML
     TextField nameCompTextField;
@@ -58,6 +67,7 @@ public class ComponentsPanelController {
     @FXML
     public void initialize() {
         this._refreshList();
+        this.columnSorterChoiceBox.getItems().addAll(ComponentColumns.values());
     }
 
     @FXML
@@ -150,6 +160,21 @@ public class ComponentsPanelController {
         currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
 
         this._componentsDAO.updateNote(currentItem);
+        this._refreshList();
+    }
+
+    @FXML
+    public void onSearchButtonClicked() {
+        var foundedItems = FXCollections.observableList(this._componentsDAO.search(
+                this.columnSorterChoiceBox.getValue().getDescription(),
+                this.searchTextField.getText()
+        ));
+        this.compList.setItems(foundedItems);
+    }
+
+    @FXML
+    public void onResetSearchButton() {
+        this.searchTextField.setText("");
         this._refreshList();
     }
 
