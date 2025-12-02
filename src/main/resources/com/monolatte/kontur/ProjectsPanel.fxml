@@ -63,7 +63,34 @@
                                  <children>
                                     <TitledPane animated="false" text="Поисковик" VBox.vgrow="NEVER">
                                       <content>
-                                        <AnchorPane />
+                                        <AnchorPane>
+                                             <children>
+                                                <GridPane layoutX="-34.0" layoutY="-35.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
+                                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                  </rowConstraints>
+                                                   <children>
+                                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Поиск" />
+                                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text=" Сортировать по колонке " GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="columnSorterChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <HBox GridPane.columnIndex="1">
+                                                         <children>
+                                                            <TextField fx:id="searchTextField" HBox.hgrow="ALWAYS" />
+                                                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="25.0" HBox.hgrow="NEVER" />
+                                                            <Button fx:id="searchButton" mnemonicParsing="false" onAction="#onSearchButton" text="Найти" />
+                                                            <Separator maxHeight="-Infinity" orientation="VERTICAL" prefHeight="25.0" HBox.hgrow="NEVER" />
+                                                            <Button fx:id="resetSearchButton" mnemonicParsing="false" onAction="#onResetSearchButton" text="Сбросить поиск" />
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </GridPane>
+                                             </children></AnchorPane>
                                       </content>
                                     </TitledPane>
                                     <TitledPane animated="false" text="Список пользователей" VBox.vgrow="ALWAYS">
@@ -88,11 +115,17 @@
                                                         </columnConstraints>
                                                         <rowConstraints>
                                                           <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                           <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                           <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                             <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                             <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                             <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID Проекта">
@@ -100,37 +133,37 @@
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Название проекта" GridPane.rowIndex="1">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Название проекта" GridPane.rowIndex="2">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата начала проекта  " GridPane.rowIndex="2">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата начала проекта  " GridPane.rowIndex="4">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата конца проекта" GridPane.rowIndex="3">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата конца проекта" GridPane.rowIndex="6">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Статус проекта" GridPane.rowIndex="4">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Статус проекта" GridPane.rowIndex="8">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Компоненты" GridPane.rowIndex="5">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Компоненты" GridPane.rowIndex="10">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
                                                             <TextField fx:id="idTextField" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
-                                                            <TextField fx:id="nameTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="startDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="endDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                            <ChoiceBox fx:id="statusChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                                            <TextField fx:id="nameTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="startDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <TextField fx:id="endDateTextField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                            <ChoiceBox fx:id="statusChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                                            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
                                                                <children>
                                                                   <ListView fx:id="inprojectComponentsListView" VBox.vgrow="ALWAYS" />
                                                                   <HBox VBox.vgrow="NEVER">
