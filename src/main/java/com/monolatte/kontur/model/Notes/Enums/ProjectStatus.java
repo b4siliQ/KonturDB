@@ -14,6 +14,11 @@ public enum ProjectStatus {
         this._description = description;
     }
 
+    @Override
+    public String toString() {
+        return this._description;
+    }
+
     public String getDescription() {
         return this._description;
     }
