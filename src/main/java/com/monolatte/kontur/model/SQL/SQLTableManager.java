@@ -15,6 +15,8 @@ public class SQLTableManager {
     private final Manufacturer_usageDAO _manufacturerUsageDAO;
     private final UserDAO _userDAO;
     private final User_usageDAO _userUsageDAO;
+    private final UserContactDAO _userContactDAO;
+    private final ManufacturerAdressesDAO _manufacturerAdressesDAO;
     private final List<ISQLDAOBase> _allManagers;
 
     private SQLTableManager() {
@@ -27,6 +29,8 @@ public class SQLTableManager {
         this._manufacturerUsageDAO = new Manufacturer_usageDAO("Manufacturer_Usage", sharedConnection);
         this._userDAO = new UserDAO("Users", sharedConnection);
         this._userUsageDAO = new User_usageDAO("User_Usage", sharedConnection);
+        this._userContactDAO = new UserContactDAO("User_Contacts", sharedConnection);
+        this._manufacturerAdressesDAO = new ManufacturerAdressesDAO("Manufacturer_Addresses", sharedConnection);
 
         _allManagers = List.of(
                 this._componentsDAO,
@@ -35,7 +39,9 @@ public class SQLTableManager {
                 this._manufacturerDAO,
                 this._manufacturerUsageDAO,
                 this._userDAO,
-                this._userUsageDAO
+                this._userUsageDAO,
+                this._userContactDAO,
+                this._manufacturerAdressesDAO
         );
     }
 
