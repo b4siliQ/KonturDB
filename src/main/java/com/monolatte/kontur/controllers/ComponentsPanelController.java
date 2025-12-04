@@ -1,6 +1,7 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
+import com.monolatte.kontur.model.Notes.Enums.ComponentsType;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
@@ -47,7 +48,7 @@ public class ComponentsPanelController {
     @FXML
     TextField nameCompTextField;
     @FXML
-    TextField typeTextEdit;
+    ChoiceBox<ComponentsType> typeChoiceBox;
     @FXML
     TextField costTextField;
     @FXML
@@ -140,7 +141,7 @@ public class ComponentsPanelController {
     public void _onAddCompButtonClicked() {
         this._componentsDAO.addNote(new Component(
                 this.nameCompTextField.getText(),
-                this.typeTextEdit.getText(),
+                this.typeChoiceBox.getTypeSelector(),
                 this.compInfoTextArea.getText(),
                 this.datasheetPathTextField.getText(),
                 Float.parseFloat(this.costTextField.getText())
@@ -154,7 +155,7 @@ public class ComponentsPanelController {
         if (currentItem == null) { return; }
 
         currentItem.setName(this.nameCompTextField.getText());
-        currentItem.setType(this.typeTextEdit.getText());
+        currentItem.setType(this.typeChoiceBox.getTypeSelector());
         currentItem.setSpecification(this.compInfoTextArea.getText());
         currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
         currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
@@ -185,7 +186,8 @@ public class ComponentsPanelController {
         if (currentItem == null) { return; }
         this.idTextField.setText(String.valueOf(currentItem.getId()));
         this.nameCompTextField.setText(currentItem.getName());
-        this.typeTextEdit.setText(currentItem.getType());
+        //TODO
+        //this.typeChoiceBox.setSelectionModel(currentItem.getType());
         this.costTextField.setText(String.valueOf(currentItem.getPrice()));
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());
