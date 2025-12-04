@@ -2,6 +2,7 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Enums.ComponentsType;
+import com.monolatte.kontur.model.Notes.Enums.ProjectStatus;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
@@ -69,13 +70,14 @@ public class ComponentsPanelController {
     public void initialize() {
         this._refreshList();
         this.columnSorterChoiceBox.getItems().addAll(ComponentColumns.values());
+        this.typeChoiceBox.getItems().addAll(ComponentsType.values());
     }
 
     @FXML
     public void _onAddEmptyButtonClicked() {
         this._componentsDAO.addNote(new Component(
                 "Empty Name",
-                "Controller Type",
+                "Empty",
                 "Enter your specification here!",
                 "Enter your datasheet link here!",
                 100
@@ -139,9 +141,10 @@ public class ComponentsPanelController {
 
     @FXML
     public void _onAddCompButtonClicked() {
+        var currentType = this.typeChoiceBox.getValue();
         this._componentsDAO.addNote(new Component(
                 this.nameCompTextField.getText(),
-                this.typeChoiceBox.getTypeSelector(),
+                currentType.getDescription(),
                 this.compInfoTextArea.getText(),
                 this.datasheetPathTextField.getText(),
                 Float.parseFloat(this.costTextField.getText())
@@ -152,10 +155,11 @@ public class ComponentsPanelController {
     @FXML
     public void _onSaveDataButtonClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
+        var currentType = this.typeChoiceBox.getValue();
         if (currentItem == null) { return; }
 
         currentItem.setName(this.nameCompTextField.getText());
-        currentItem.setType(this.typeChoiceBox.getTypeSelector());
+        currentItem.setType(currentType.getDescription());
         currentItem.setSpecification(this.compInfoTextArea.getText());
         currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
         currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
@@ -187,7 +191,7 @@ public class ComponentsPanelController {
         this.idTextField.setText(String.valueOf(currentItem.getId()));
         this.nameCompTextField.setText(currentItem.getName());
         //TODO
-        //this.typeChoiceBox.setSelectionModel(currentItem.getType());
+        this.typeChoiceBox.setValue(ComponentsType.getByDescription(currentItem.getType()));
         this.costTextField.setText(String.valueOf(currentItem.getPrice()));
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());

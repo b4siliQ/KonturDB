@@ -23,7 +23,7 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
                         + "addresses_type TEXT NOT NULL, "
                         + "city TEXT NOT NULL, "
                         + "manufacturer_id INTEGER NOT NULL, "
-                        + "FOREIGN KEY(manufacturer_id) REFERENCES Manufacturer(id) ON DELETE CASCADE)",
+                        + "FOREIGN KEY(manufacturer_id) REFERENCES Manufacturers(id) ON DELETE CASCADE)",
                 this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
