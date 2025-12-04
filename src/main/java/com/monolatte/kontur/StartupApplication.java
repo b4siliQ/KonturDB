@@ -19,6 +19,8 @@ public class StartupApplication extends Application {
         stage.setTitle("KonturDB");
         stage.setScene(scene);
         stage.show();
+
+
     }
 
     private void _initTables() {
