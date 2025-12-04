@@ -19,8 +19,8 @@ public enum ComponentsType implements IColumn {
     @Override
     public String getDescription() { return this._description; }
 
-    public static ProjectColumns getByDescription(String description) {
-        for (var column : ProjectColumns.values()) {
+    public static ComponentsType getByDescription(String description) {
+        for (var column : ComponentsType.values()) {
             if (column.getDescription().equalsIgnoreCase(description)) {
                 return column;
             }
