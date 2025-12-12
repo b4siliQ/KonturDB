@@ -234,7 +234,9 @@ public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usa
                             rs.getString("type"),
                             rs.getString("specification"),
                             rs.getString("datasheet_link"),
-                            rs.getFloat("price"));
+                            rs.getFloat("price"),
+                            rs.getInt("quantity")
+                    );
 
                     component.setId(rs.getLong("id"));
                     components.add(component);

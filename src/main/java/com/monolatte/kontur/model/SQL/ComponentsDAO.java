@@ -18,7 +18,7 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     public void createTable() {
         String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s (id INTEGER PRIMARY KEY AUTOINCREMENT," // <-- Добавлен пробел перед (id
                 + " name TEXT NOT NULL, type TEXT NOT NULL, specification TEXT NOT NULL,"
-                + "datasheet_link TEXT NOT NULL, price REAL NOT NULL)", this._tableName);
+                + "datasheet_link TEXT NOT NULL, price REAL NOT NULL, quantity INTEGER NOT NULL)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " created or already exists");
@@ -40,13 +40,14 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
 
     @Override
     public void addNote(Component component) {
-        String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price) VALUES(?,?,?,?,?)", this._tableName);
+        String sqlRequest = String.format("INSERT INTO %s (name, type, specification, datasheet_link, price, quantity) VALUES(?,?,?,?,?,?)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, component.getName());
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
             pstmt.setFloat(5, component.getPrice());
+            pstmt.setInt(6, component.getQuantity());
 
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
@@ -85,14 +86,15 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     @Override
     public void updateNote(Component component) {
         String sqlRequest = String.format("UPDATE %s SET name = ?, type = ?, specification = ?,"
-                + "datasheet_link = ?, price = ? WHERE id = ?", this._tableName);
+                + "datasheet_link = ?, price = ?, quantity = ? WHERE id = ?", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setString(1, component.getName());
             pstmt.setString(2, component.getType());
             pstmt.setString(3, component.getSpecification());
             pstmt.setString(4, component.getDatasheet_link());
             pstmt.setFloat(5, component.getPrice());
-            pstmt.setLong(6, component.getId());
+            pstmt.setInt(6, component.getQuantity());
+            pstmt.setLong(7, component.getId());
             pstmt.executeUpdate();
             System.out.println("Table " + this._tableName + " updated");
         } catch (SQLException e) {
@@ -149,7 +151,8 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
         rs.getString("type"),
         rs.getString("specification"),
         rs.getString("datasheet_link"),
-        rs.getFloat("price"));
+        rs.getFloat("price"),
+        rs.getInt("quantity"));
 
         component.setId(rs.getLong("id"));
 

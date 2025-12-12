@@ -6,13 +6,15 @@ public class Component extends BaseNote {
     String specification;
     String datasheet_link;
     float price;
+    int quantity;
 
-    public Component(String name, String type, String specification, String datasheet_link, float price) {
+    public Component(String name, String type, String specification, String datasheet_link, float price, int quantity) {
         this.name = name;
         this.type = type;
         this.specification = specification;
         this.datasheet_link = datasheet_link;
         this.price = price;
+        this.quantity = quantity;
     }
 
     @Override
@@ -57,5 +59,14 @@ public class Component extends BaseNote {
     public void setPrice(float price) {
         this.price = price;
     }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
 }
 

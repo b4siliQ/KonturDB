@@ -4,6 +4,8 @@ import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Properties.ComponentProperty;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.SQL.SQLTableManager;
+import javafx.beans.property.SimpleFloatProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -28,6 +30,10 @@ public class ComponentTablePopupController {
     TableColumn<ComponentProperty, String> datasheetLinkColumn;
     @FXML
     TableColumn<ComponentProperty, Float> priceColumn;
+    @FXML
+    TableColumn<ComponentProperty, Integer> quantityColumn;
+    @FXML
+    TableColumn<ComponentProperty, Float> finalPriceColumn;
     @FXML
     TextField searchTextField;
     @FXML
@@ -54,6 +60,12 @@ public class ComponentTablePopupController {
         this.specificationColumn.setCellValueFactory(cellData -> cellData.getValue().specificationProperty());
         this.datasheetLinkColumn.setCellValueFactory(cellData -> cellData.getValue().datasheetLinkProperty());
         this.priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject()); // asObject()
+        this.quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
+        this.finalPriceColumn.setCellValueFactory(cellData -> {
+            ComponentProperty component = cellData.getValue();
+            float result = component.priceProperty().getValue() * component.quantityProperty().getValue();
+            return new SimpleFloatProperty(result).asObject();
+        });
     }
 
     private void _loadDataIntoTable() {

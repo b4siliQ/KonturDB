@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.ComponentsPanelController">
+<VBox prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.ComponentsPanelController">
    <children>
       <SplitPane dividerPositions="0.35" VBox.vgrow="ALWAYS">
         <items>
@@ -139,6 +126,8 @@
                                                             <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                             <RowConstraints minHeight="10.0" vgrow="NEVER" />
                                                             <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
+                                                            <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                                            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="2.0" vgrow="NEVER" />
                                                         </rowConstraints>
                                                          <children>
                                                             <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID Детали">
@@ -161,12 +150,12 @@
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="  Описание Детали  " GridPane.rowIndex="8">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="  Описание Детали  " GridPane.rowIndex="10">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
                                                             </Label>
-                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Путь к Datasheet" GridPane.rowIndex="10">
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Путь к Datasheet" GridPane.rowIndex="12">
                                                                <font>
                                                                   <Font size="14.0" />
                                                                </font>
@@ -174,9 +163,15 @@
                                                             <TextField fx:id="idTextField" editable="false" GridPane.columnIndex="1" />
                                                             <TextField fx:id="nameCompTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                             <TextField fx:id="costTextField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                                            <TextField fx:id="datasheetPathTextField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                                                            <TextArea fx:id="compInfoTextArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                                            <TextField fx:id="datasheetPathTextField" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                                                            <TextField fx:id="quantityTextField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                                            <TextArea fx:id="compInfoTextArea" prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
                                                             <ChoiceBox fx:id="typeChoiceBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Количество Деталей" GridPane.rowIndex="8">
+                                                               <font>
+                                                                  <Font size="14.0" />
+                                                               </font>
+                                                            </Label>
                                                          </children>
                                                       </GridPane>
                                                       <VBox VBox.vgrow="NEVER">

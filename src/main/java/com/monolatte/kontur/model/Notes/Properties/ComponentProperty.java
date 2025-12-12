@@ -1,12 +1,7 @@
 package com.monolatte.kontur.model.Notes.Properties;
 
 import com.monolatte.kontur.model.Notes.Component;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 public class ComponentProperty {
 
@@ -15,6 +10,7 @@ public class ComponentProperty {
     private final StringProperty specification;
     private final StringProperty datasheetLink;
     private final FloatProperty price;
+    private final IntegerProperty quantity;
     private final LongProperty id;
 
     public ComponentProperty(Component component) {
@@ -23,6 +19,7 @@ public class ComponentProperty {
         this.specification = new SimpleStringProperty(component.getSpecification());
         this.datasheetLink = new SimpleStringProperty(component.getDatasheet_link());
         this.price = new SimpleFloatProperty(component.getPrice());
+        this.quantity = new SimpleIntegerProperty(component.getQuantity());
         this.id = new SimpleLongProperty(component.getId());
     }
 
@@ -35,4 +32,5 @@ public class ComponentProperty {
     public StringProperty specificationProperty() { return this.specification; }
     public StringProperty datasheetLinkProperty() { return this.datasheetLink; }
     public FloatProperty priceProperty() { return this.price; }
+    public IntegerProperty quantityProperty() { return this.quantity; }
 }

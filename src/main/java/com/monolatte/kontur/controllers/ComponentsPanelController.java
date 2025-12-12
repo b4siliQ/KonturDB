@@ -53,6 +53,8 @@ public class ComponentsPanelController {
     @FXML
     TextField costTextField;
     @FXML
+    TextField quantityTextField;
+    @FXML
     TextArea compInfoTextArea;
     @FXML
     TextField datasheetPathTextField;
@@ -80,7 +82,8 @@ public class ComponentsPanelController {
                 "Empty",
                 "Enter your specification here!",
                 "Enter your datasheet link here!",
-                100
+                100,
+                1
         ));
         this._refreshList();
     }
@@ -149,7 +152,8 @@ public class ComponentsPanelController {
                 currentType.getDescription(),
                 this.compInfoTextArea.getText(),
                 this.datasheetPathTextField.getText(),
-                Float.parseFloat(this.costTextField.getText())
+                Float.parseFloat(this.costTextField.getText()),
+                Integer.parseInt(this.quantityTextField.getText())
         ));
         this._refreshList();
     }
@@ -165,6 +169,7 @@ public class ComponentsPanelController {
         currentItem.setSpecification(this.compInfoTextArea.getText());
         currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
         currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
+        currentItem.setQuantity(Integer.parseInt(this.quantityTextField.getText()));
 
         this._componentsDAO.updateNote(currentItem);
         this._refreshList();
@@ -192,9 +197,9 @@ public class ComponentsPanelController {
         if (currentItem == null) { return; }
         this.idTextField.setText(String.valueOf(currentItem.getId()));
         this.nameCompTextField.setText(currentItem.getName());
-        //TODO
         this.typeChoiceBox.setValue(ComponentsType.getByDescription(currentItem.getType()));
         this.costTextField.setText(String.valueOf(currentItem.getPrice()));
+        this.quantityTextField.setText(String.valueOf(currentItem.getQuantity()));
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());
 

@@ -190,7 +190,8 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
                             rs.getString("type"),
                             rs.getString("specification"),
                             rs.getString("datasheet_link"),
-                            rs.getFloat("price"));
+                            rs.getFloat("price"),
+                            rs.getInt("quantity"));
 
                     component.setId(rs.getLong("id"));
                     components.add(component);
