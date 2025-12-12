@@ -1,0 +1,10 @@
+.table-row-cell:filled.highlighted-row {
+    -fx-background-color: #a7d0ff; /* Светло-синий цвет */
+    -fx-background: #a7d0ff;
+}
+
+.table-row-cell:filled:selected.highlighted-row {
+    -fx-background-color: #3b91ff; /* Более насыщенный синий при выделении */
+    -fx-background: #3b91ff;
+    -fx-text-fill: white;
+}
