@@ -20,7 +20,6 @@ public class StartupApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-
     }
 
     private void _initTables() {
