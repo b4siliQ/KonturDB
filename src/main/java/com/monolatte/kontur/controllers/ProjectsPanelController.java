@@ -97,6 +97,8 @@ public class ProjectsPanelController {
             Stage popupStage = new Stage();
             Scene popupScene = new Scene(root);
 
+            popupScene.getStylesheets().add(getClass().getResource("/com/monolatte/style/application.css").toExternalForm());
+
             popupStage.setScene(popupScene);
 
             popupStage.setTitle("Project table");
