@@ -16,6 +16,8 @@ public class MainPanelController {
     Tab manufacturerTab;
     @FXML
     Tab userTab;
+    @FXML
+    Tab aboutDevsTab;
 
     @FXML
     public void initialize() {
@@ -58,6 +60,17 @@ public class MainPanelController {
             ));
             Parent subview = userLoader.load();
             this.userTab.setContent(subview);
+        } catch (IOException e) {
+            System.err.println("Alert! An error has occurred while loading user tab");
+            throw new RuntimeException(e);
+        }
+
+        try {
+            FXMLLoader aboutDevsLoader = new FXMLLoader(MainPanelController.class.getResource(
+                    "/com/monolatte/kontur/AboutDevelopersPanel.fxml"
+            ));
+            Parent subview = aboutDevsLoader.load();
+            this.aboutDevsTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading user tab");
             throw new RuntimeException(e);
