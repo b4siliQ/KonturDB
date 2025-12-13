@@ -27,6 +27,10 @@ public class ProjectTablePopupController {
     @FXML
     TableColumn<ProjectProperty, String> statusColumn;
     @FXML
+    TableColumn<ProjectProperty, Integer> componentsQuantityTable;
+    @FXML
+    TableColumn<ProjectProperty, Float> totalPriceColumn;
+    @FXML
     TextField searchTextField;
     @FXML
     CheckBox filterCheckBox;
@@ -51,6 +55,8 @@ public class ProjectTablePopupController {
         this.startDateColumn.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
         this.endDateColumn.setCellValueFactory(cellData -> cellData.getValue().endDateProperty());
         this.statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        this.componentsQuantityTable.setCellValueFactory(cellData -> cellData.getValue().componentsQuantityProperty().asObject());
+        this.totalPriceColumn.setCellValueFactory(cellData -> cellData.getValue().totalComponentPriceProperty().asObject());
     }
 
     private void _loadDataIntoTable() {
