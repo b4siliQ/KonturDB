@@ -53,6 +53,8 @@ public class ProjectsPanelController {
     @FXML
     Button addInProjectComponentButton;
     @FXML
+    Button changeInProjectComponentButton;
+    @FXML
     Button removeInProjectComponentButton;
     @FXML
     Button addProjectButton;
@@ -113,9 +115,11 @@ public class ProjectsPanelController {
     }
 
     @FXML
-    public void onOpenUserButton() {
+    public void onOpenUserButtonClicked() {
         try {
-            var popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource("/com/monolatte/kontur/UserTablePopup.fxml"));
+            var popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource(
+                    "/com/monolatte/kontur/UsersPopup.fxml"
+            ));
             Parent root = popupLoader.load();
 
             Stage popupStage = new Stage();
@@ -123,7 +127,7 @@ public class ProjectsPanelController {
 
             popupStage.setScene(popupScene);
 
-            popupStage.setTitle("User Table");
+            popupStage.setTitle("User window");
             popupStage.setResizable(false);
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.showAndWait();
@@ -163,6 +167,50 @@ public class ProjectsPanelController {
                         currentProject.getId(),
                         result.getId()
                 ));
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        this._refreshComponentList();
+    }
+
+    @FXML
+    public void onChangeInProjectComponentButton() {
+        var currentProject = this.projectListView.getSelectionModel().getSelectedItem();
+        var currentComponent = this.inprojectComponentsListView.getSelectionModel().getSelectedItem();
+        if (currentProject == null) { return; }
+        if (currentComponent == null) { return; }
+
+        try {
+            FXMLLoader popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource(
+                    "/com/monolatte/kontur/SearchPopup.fxml"
+            ));
+            Parent root = popupLoader.load();
+            SearchPopupController<Component> popupController = popupLoader.getController();
+
+            popupController.initDAO(DAOFactory.DAOType.COMPONENT);
+            popupController.initData(ComponentColumns.values());
+
+            Stage newStage = new Stage();
+            Scene newScene = new Scene(root);
+            newStage.setScene(newScene);
+            popupController.setStage(newStage);
+
+            newStage.setTitle("Component Searcher");
+            newStage.setResizable(false);
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.showAndWait();
+
+            var result = popupController.getChosenObject();
+            if (result == null) {
+                var usage = new Component_usage(
+                        currentProject.getId(),
+                        result.getId()
+                );
+                usage.setId(currentComponent.getId());
+                this._componentsUsageDAO.updateNote(usage);
             }
 
         } catch (IOException e) {

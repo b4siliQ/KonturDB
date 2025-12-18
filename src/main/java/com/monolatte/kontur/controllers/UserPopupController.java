@@ -2,10 +2,7 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Properties.ProjectProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-
-import java.awt.*;
+import javafx.scene.control.*;
 
 public class UserPopupController {
     @FXML
@@ -40,4 +37,24 @@ public class UserPopupController {
     TableColumn<ProjectProperty, Integer> qantityTableColumn;
     @FXML
     TableColumn<ProjectProperty, Float> totalPriceTableColumn;
+
+    @FXML
+    public void onShowUserButtonClicked() {
+
+    }
+
+    @FXML
+    public void onAddUserButtonClicked() {
+
+    }
+
+    @FXML
+    public void onAddProjectButtonClicked() {
+
+    }
+
+    @FXML
+    public void onRemoveProjectButtonClicked() {
+
+    }
 }
