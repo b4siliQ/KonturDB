@@ -29,6 +29,8 @@ public class ProjectsPanelController {
     @FXML
     Button openInTableButton;
     @FXML
+    Button openUserButton;
+    @FXML
     Button searchButton;
     @FXML
     Button resetSearchButton;
@@ -102,6 +104,26 @@ public class ProjectsPanelController {
             popupStage.setScene(popupScene);
 
             popupStage.setTitle("Project table");
+            popupStage.setResizable(false);
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    public void onOpenUserButton() {
+        try {
+            var popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource("/com/monolatte/kontur/UserTablePopup.fxml"));
+            Parent root = popupLoader.load();
+
+            Stage popupStage = new Stage();
+            Scene popupScene = new Scene(root);
+
+            popupStage.setScene(popupScene);
+
+            popupStage.setTitle("User Table");
             popupStage.setResizable(false);
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.showAndWait();
