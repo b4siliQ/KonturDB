@@ -1,8 +1,8 @@
 package com.monolatte.kontur.model.Notes.Enums;
 
 public enum UserColumns implements IColumn {
-    USER_NAME(1, "user_name"),
-    DESCRIPTION(2, "end_d");
+    USER_NAME(1, "name"),
+    DESCRIPTION(2, "description");
 
     private final int _code;
     private final String _description;
