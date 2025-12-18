@@ -3,13 +3,10 @@ package com.monolatte.kontur.controllers;
 import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ProjectColumns;
 import com.monolatte.kontur.model.Notes.Enums.UserColumns;
-import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Properties.ProjectProperty;
 import com.monolatte.kontur.model.SQL.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,23 +20,23 @@ import java.util.List;
 
 public class UserPopupController {
     @FXML
-    private Label nameLabel;
+    Label nameLabel;
     @FXML
-    private TextArea descriptionTextArea;
+    TextArea descriptionTextArea;
     @FXML
-    private TextField contactTextField;
+    TextField contactTextField;
     @FXML
-    private TextField contactTypeTextField;
+    TextField contactTypeTextField;
     @FXML
-    private Button showUserButton;
+    Button showUserButton;
     @FXML
-    private Button addUserButton;
+    Button addUserButton;
     @FXML
-    private Button addProjectButton;
+    Button addProjectButton;
     @FXML
-    private Button removeProjectButton;
+    Button removeProjectButton;
     @FXML
-    TableView<ProjectProperty> projectsTable;
+    TableView<ProjectProperty> projectTable;
     @FXML
     TableColumn<ProjectProperty, Long> idTableColumn;
     @FXML
@@ -56,84 +53,69 @@ public class UserPopupController {
     TableColumn<ProjectProperty, Float> totalPriceTableColumn;
 
     private final ProjectDAO _projectDAO = SQLTableManager.getInstance().getProjectManager();
-    private final UserDAO _userDAO = SQLTableManager.getInstance().getUserDAO();
+    private final UserContactDAO _userContactDAO = SQLTableManager.getInstance().getUserContactDAO();
     private final User_usageDAO _userUsageDAO = SQLTableManager.getInstance().getUserUsageDAO();
     private final ObservableList<ProjectProperty> _masterData = FXCollections.observableArrayList();
+    private User _currentUser;
+    private UserContact _currentUserContact;
 
     @FXML
     public void initialize() {
         this._setupTableColumns();
-        this._loadDataIntoTable();
-    }
-
-    private void _setupTableColumns() {
-        this.idTableColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
-        this.projectNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        this.startDateTableColumn.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
-        this.endDateTableColumn.setCellValueFactory(cellData -> cellData.getValue().endDateProperty());
-        this.statusTableColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
-        this.qantityTableColumn.setCellValueFactory(cellData -> cellData.getValue().componentsQuantityProperty().asObject());
-        this.totalPriceTableColumn.setCellValueFactory(cellData -> cellData.getValue().totalComponentPriceProperty().asObject());
-    }
-
-    private void _loadDataIntoTable() {
-        this._fillProjectPropertyList(this._projectDAO.getAllNotes());
-        this.projectsTable.setItems(this._masterData);
     }
 
     @FXML
     public void onShowUserButtonClicked() {
+        try {
+            var popupLoader = new FXMLLoader(UserPopupController.class.getResource(
+                    "/com/monolatte/kontur/SearchPopup.fxml"
+            ));
+            Parent root = popupLoader.load();
+            SearchPopupController<User> popupController = popupLoader.getController();
+
+            popupController.initDAO(DAOFactory.DAOType.USER);
+            popupController.initData(UserColumns.values());
+
+            var newStage = new Stage();
+            var newScene = new Scene(root);
+            newStage.setScene(newScene);
+            popupController.setStage(newStage);
+
+            newStage.setTitle("User Searcher");
+            newStage.setResizable(false);
+            newStage.initModality(Modality.APPLICATION_MODAL);
+            newStage.showAndWait();
+
+            var result = popupController.getChosenObject();
+            if (result != null) {
+                this._currentUser = result;
+
+                this._currentUserContact = this._userContactDAO.getUserContactByUserId(this._currentUser.getId());
+
+                this._loadDataIntoTable();
+                this._refillUserFields();
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 
     @FXML
     public void onAddUserButtonClicked() {
-//        try {
-//            FXMLLoader popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource(
-//                    "/com/monolatte/kontur/SearchPopup.fxml"
-//            ));
-//            Parent root = popupLoader.load();
-//            SearchPopupController<User> popupController = popupLoader.getController();
-//
-//            popupController.initDAO(DAOFactory.DAOType.USER);
-//            popupController.initData(UserColumns.values());
-//
-//            Stage newStage = new Stage();
-//            Scene newScene = new Scene(root);
-//            newStage.setScene(newScene);
-//            popupController.setStage(newStage);
-//
-//            newStage.setTitle("User Searcher");
-//            newStage.setResizable(false);
-//            newStage.initModality(Modality.APPLICATION_MODAL);
-//            newStage.showAndWait();
-//
-//            var result = popupController.getChosenObject();
-//            if (result != null) {
-//                this._userUsageDAO.addNote(new User_usage(
-//                        currentProject.getId(),
-//                        result.getId()
-//                ));
-//            }
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        this._refreshComponentList();
+
     }
 
     @FXML
     public void onAddProjectButtonClicked() {
-        var currentUser = this.projectListView.getSelectionModel().getSelectedItem();
-        if (currentUser == null) { return; }
-
         try {
-            FXMLLoader popupLoader = new FXMLLoader(ProjectsPanelController.class.getResource(
+            var popupLoader = new FXMLLoader(UserPopupController.class.getResource(
                     "/com/monolatte/kontur/SearchPopup.fxml"
             ));
             Parent root = popupLoader.load();
-            SearchPopupController<Component> popupController = popupLoader.getController();
+            SearchPopupController<Project> popupController = popupLoader.getController();
 
             popupController.initDAO(DAOFactory.DAOType.PROJECT);
             popupController.initData(ProjectColumns.values());
@@ -150,9 +132,9 @@ public class UserPopupController {
 
             var result = popupController.getChosenObject();
             if (result != null) {
-                this._userUsageDAO.addNote(new Component_usage(
-                        currentUser.getId(),
-                        result.getId()
+                this._userUsageDAO.addNote(new User_usage(
+                        result.getId(),
+                        this._currentUser.getId()
                 ));
             }
 
@@ -160,12 +142,54 @@ public class UserPopupController {
             throw new RuntimeException(e);
         }
 
-        this._refreshComponentList();
+        this._loadDataIntoTable();
     }
 
     @FXML
     public void onRemoveProjectButtonClicked() {
 
+    }
+
+    private void _refillUserFields() {
+        this.nameLabel.setText(this._currentUser.getName());
+        this.descriptionTextArea.setText(this._currentUser.getDescription());
+        if (this._currentUserContact != null) {
+            this.contactTypeTextField.setText(this._currentUserContact.getContact_type());
+            this.contactTextField.setText(this._currentUserContact.getContact_value());
+        } else {
+            this.contactTypeTextField.setText("Не указано");
+            this.contactTextField.setText("");
+        }
+    }
+
+    private void _setupTableColumns() {
+        this.idTableColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        this.projectNameTableColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        this.startDateTableColumn.setCellValueFactory(cellData -> cellData.getValue().startDateProperty());
+        this.endDateTableColumn.setCellValueFactory(cellData -> cellData.getValue().endDateProperty());
+        this.statusTableColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        this.qantityTableColumn.setCellValueFactory(cellData -> cellData.getValue().componentsQuantityProperty().asObject());
+        this.totalPriceTableColumn.setCellValueFactory(cellData -> cellData.getValue().totalComponentPriceProperty().asObject());
+    }
+
+    private void _loadDataIntoTable() {
+        // 1. Проверяем, не пустой ли список данных
+        var notes = this._userUsageDAO.getProjectsByUserId(this._currentUser.getId());
+        if (notes == null) {
+            System.err.println("DAO вернул null вместо списка проектов");
+            return;
+        }
+
+        this._fillProjectPropertyList(notes);
+
+        // 2. ГЛАВНАЯ ПРОВЕРКА
+        if (this.projectTable == null) {
+            System.err.println("!!! АХТУНГ !!! projectsTable == null. " +
+                    "Это значит, что метод вызван в контроллере, который не привязан к активному FXML с таблицей.");
+            return;
+        }
+
+        this.projectTable.setItems(this._masterData);
     }
 
     private void _fillProjectPropertyList(List<Project> projectList) {

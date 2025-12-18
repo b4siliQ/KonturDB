@@ -41,6 +41,8 @@ public class ComponentsPanelController {
     @FXML
     Button resetSearchButton;
     @FXML
+    Button openManufacturerButton;
+    @FXML
     ChoiceBox<ComponentColumns> columnSorterChoiceBox;
     @FXML
     TextField searchTextField;
@@ -112,6 +114,28 @@ public class ComponentsPanelController {
             popupStage.setScene(popupScene);
 
             popupStage.setTitle("Component table");
+            popupStage.setResizable(false);
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @FXML
+    public void onOpenManufacturerButtonClicked() {
+        try {
+            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
+                    "/com/monolatte/kontur/ManufacturerPopup.fxml"
+            ));
+            Parent root = popupLoader.load();
+
+            Stage popupStage = new Stage();
+            Scene popupScene = new Scene(root);
+
+            popupStage.setScene(popupScene);
+
+            popupStage.setTitle("Manufacturer window");
             popupStage.setResizable(false);
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.showAndWait();

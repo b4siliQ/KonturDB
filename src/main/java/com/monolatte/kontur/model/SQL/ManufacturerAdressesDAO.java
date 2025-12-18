@@ -144,41 +144,42 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
         return notes;
     }
 
-    public List<ManufacturerAddresses> getManufacturerAddressesByManufacturerId(long userId) {
-        List<ManufacturerAddresses> manufacturerAddresses = new ArrayList<>();
+    public ManufacturerAddresses getManufacturerAddressesByManufacturerId(long manufacturerId) {
+        ManufacturerAddresses manufacturerAddress = null;
+
+        // SQL запрос для связи 1:1
         String sqlRequest = String.format(
-                "SELECT m.* FROM ManufacturerAddresses m " +
+                "SELECT m.* FROM Manufacturer_Addresses m " +
                         "INNER JOIN %s mu ON m.id = mu.id " +
-                        "WHERE mu.manufacturer_id = ?",
+                        "WHERE mu.manufacturer_id = ? LIMIT 1",
                 this._tableName
         );
 
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, userId);
+            pstmt.setLong(1, manufacturerId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    // Используем ваш существующий метод маппинга
-                    ManufacturerAddresses manufacturerAddress = new ManufacturerAddresses(
+                // Используем if, так как ожидаем только одну запись
+                if (rs.next()) {
+                    manufacturerAddress = new ManufacturerAddresses(
                             rs.getLong("manufacturer_id"),
                             rs.getString("addresses_type"),
                             rs.getString("city"),
                             rs.getString("full_address")
                     );
-
+                    // Устанавливаем ID из базы данных
                     manufacturerAddress.setId(rs.getLong("id"));
-                    manufacturerAddresses.add(manufacturerAddress);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении проекта для пользователей: " + e.getMessage(), e);
+            throw new RuntimeException("Ошибка при получении адреса производителя ID " + manufacturerId + ": " + e.getMessage(), e);
         }
 
-        return manufacturerAddresses;
+        return manufacturerAddress;
     }
 
 
-    public List<Manufacturer> getManufacturersByManufacturerAddressesId(long addressesId) {
+    public List<Manufacturer> getManufacturerByManufacturerAddressesId(long addressesId) {
         List<Manufacturer> manufacturers = new ArrayList<>();
         String sqlRequest = String.format(
                 "SELECT m.* FROM Manufacturers m " +

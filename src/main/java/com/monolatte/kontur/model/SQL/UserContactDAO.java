@@ -144,12 +144,14 @@ public class UserContactDAO implements ISQLDAOSearchable<UserContact> {
         return notes;
     }
 
-    public List<UserContact> getUserContactByUserId(long userId) {
-        List<UserContact> userContacts = new ArrayList<>();
+    public UserContact getUserContactByUserId(long userId) {
+        UserContact userContact = null;
+
+        // Формируем запрос для получения одного контакта
         String sqlRequest = String.format(
-                "SELECT u.* FROM UserContact u " +
+                "SELECT u.* FROM User_Contacts u " +
                         "INNER JOIN %s mu ON u.id = mu.id " +
-                        "WHERE mu.user_id = ?",
+                        "WHERE mu.user_id = ? LIMIT 1",
                 this._tableName
         );
 
@@ -157,28 +159,29 @@ public class UserContactDAO implements ISQLDAOSearchable<UserContact> {
             pstmt.setLong(1, userId);
 
             try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    // Используем ваш существующий метод маппинга
-                    UserContact userContact = new UserContact(
+                // Используем if, так как связь 1:1
+                if (rs.next()) {
+                    userContact = new UserContact(
                             rs.getLong("user_id"),
                             rs.getString("contact_type"),
                             rs.getString("contact_value")
                     );
 
                     userContact.setId(rs.getLong("id"));
-                    userContacts.add(userContact);
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении проекта для пользователей: " + e.getMessage(), e);
+            // Исправила описание ошибки на актуальное
+            throw new RuntimeException("Ошибка при получении контактов пользователя ID " + userId + ": " + e.getMessage(), e);
         }
 
-        return userContacts;
+        return userContact;
     }
 
 
-    public List<User> getUsersByUserContactId(long contactId) {
-        List<User> users = new ArrayList<>();
+    public User getUserByUserContactId(long contactId) {
+        //List<User> users = new ArrayList<>();
+        User user = null;
         String sqlRequest = String.format(
                 "SELECT u.* FROM Users u " +
                         "INNER JOIN %s mu ON u.id = mu.user_id " +
@@ -191,19 +194,19 @@ public class UserContactDAO implements ISQLDAOSearchable<UserContact> {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    User user = new User(
+                    user = new User(
                             rs.getString("name"),
                             rs.getString("description"));
 
                     user.setId(rs.getLong("id"));
-                    users.add(user);
+                    //users.add(user);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при получении пользователей для проекта: " + e.getMessage(), e);
         }
 
-        return users;
+        return user;
     }
 
     public void removeContactByUserId(long userId) {
