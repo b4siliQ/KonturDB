@@ -61,9 +61,13 @@ public class SQLTableManager {
 
     public Manufacturer_usageDAO getManufacturerUsageDAO() { return _manufacturerUsageDAO; }
 
+    public ManufacturerAdressesDAO getManufacturerAddressDAO() { return _manufacturerAdressesDAO; }
+
     public UserDAO getUserDAO() { return _userDAO; }
 
     public User_usageDAO getUserUsageDAO() { return _userUsageDAO; }
+
+    public UserContactDAO getUserContactDAO() { return _userContactDAO; }
 
     public List<ISQLDAOBase> getAllManagers() { return this._allManagers; }
 
