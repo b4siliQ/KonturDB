@@ -93,7 +93,7 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, component_usage.getProject_id());
             pstmt.setLong(2, component_usage.getComponent_id());
-            pstmt.setLong(4, component_usage.getId());
+            pstmt.setLong(3, component_usage.getId());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
