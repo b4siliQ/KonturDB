@@ -174,6 +174,7 @@
                                                                   <HBox VBox.vgrow="NEVER">
                                                                      <children>
                                                                         <Button fx:id="addInProjectComponentButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#addInProjectComponentButtonClicked" text="Добавить компонент" HBox.hgrow="ALWAYS" />
+                                                                        <Button fx:id="changeInProjectComponentButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onChangeInProjectComponentButton" text="Изменить компонент" HBox.hgrow="ALWAYS" />
                                                                         <Button fx:id="removeInProjectComponentButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#removeInProjectComponentButtonClicked" text="Удалить компонент" HBox.hgrow="ALWAYS" />
                                                                      </children>
                                                                   </HBox>
