@@ -126,7 +126,7 @@ public class ComponentsPanelController {
     public void onOpenManufacturerButtonClicked() {
         try {
             var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
-                    "/com/monolatte/kontur/ManufacturerPopup.fxml"
+                    "/com/monolatte/kontur/ManufacturersPopup.fxml"
             ));
             Parent root = popupLoader.load();
 

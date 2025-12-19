@@ -46,7 +46,7 @@ public class ManufacturerPopupController {
     @FXML
     TableColumn<ComponentProperty, Float> finalCostTableColumn;
     @FXML
-    TableColumn<ProjectProperty, Button> projectsTableColumn; // ! Неточная реализация
+    TableColumn<ComponentProperty, Void> projectsTableColumn; // ! Неточная реализация
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
     private final ManufacturerAdressesDAO _manufacturerAddressDAO = SQLTableManager.getInstance().getManufacturerAddressDAO();
@@ -104,7 +104,7 @@ public class ManufacturerPopupController {
         this.nameTextField.setText(this._currentManufacturer.getName());
         this.descriptionTextArea.setText(this._currentManufacturer.getDescription());
         this.addressTypeTextField.setText(this._currentManufacturerAddress.getAddresses_type());
-        this.cityTextField.setText(this._currentManufacturerAddress.getFull_address());
+        this.cityTextField.setText(this._currentManufacturerAddress.getCity());
     }
 
     private void _setupTableColumns() {
@@ -117,6 +117,39 @@ public class ManufacturerPopupController {
             ComponentProperty component = cellData.getValue();
             float result = component.priceProperty().getValue() * component.quantityProperty().getValue();
             return new SimpleFloatProperty(result).asObject();
+        });
+
+        this.finalCostTableColumn.setCellValueFactory(cellData -> {
+            ComponentProperty component = cellData.getValue();
+            float result = component.priceProperty().get() * component.quantityProperty().get();
+
+            return new SimpleFloatProperty(result).asObject();
+        });
+
+        this.projectsTableColumn.setCellFactory(param -> new TableCell<ComponentProperty, Void>() {
+            private final Button btn = new Button("Проекты");
+
+            {
+                btn.setMaxWidth(Double.MAX_VALUE);
+                btn.setOnAction(event -> {
+                    // Извлекаем объект ComponentProperty из текущей строки
+                    ComponentProperty item = getTableRow().getItem();
+                    if (item != null) {
+                        System.out.println("Выбран компонент: " + item.idProperty().get());
+                        // Здесь вызывайте метод для открытия проектов, передавая в него 'item'
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
         });
     }
 
