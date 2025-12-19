@@ -164,8 +164,7 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
                     manufacturerAddress = new ManufacturerAddresses(
                             rs.getLong("manufacturer_id"),
                             rs.getString("addresses_type"),
-                            rs.getString("city"),
-                            rs.getString("full_address")
+                            rs.getString("city")
                     );
                     // Устанавливаем ID из базы данных
                     manufacturerAddress.setId(rs.getLong("id"));
@@ -224,8 +223,7 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
         ManufacturerAddresses manufacturerAddresses = new ManufacturerAddresses(
                 rs.getLong("manufacturer_id"),
                 rs.getString("addresses_type"),
-                rs.getString("city"),
-                rs.getString("full_address")
+                rs.getString("city")
         );
 
         manufacturerAddresses.setId(rs.getLong("id"));

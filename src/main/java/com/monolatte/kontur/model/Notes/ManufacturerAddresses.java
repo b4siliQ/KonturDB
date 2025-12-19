@@ -4,13 +4,11 @@ public class ManufacturerAddresses extends BaseNote {
     private long manufacturer_id;
     private String addresses_type;
     private String city;
-    private String full_address;
 
-    public ManufacturerAddresses(long manufacturer_id, String addresses_type, String city, String full_address) {
+    public ManufacturerAddresses(long manufacturer_id, String addresses_type, String city) {
         this.manufacturer_id = manufacturer_id;
         this.addresses_type = addresses_type;
         this.city = city;
-        this.full_address = full_address;
     }
 
     public long getManufacturer_id() {
@@ -35,13 +33,5 @@ public class ManufacturerAddresses extends BaseNote {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getFull_address() {
-        return full_address;
-    }
-
-    public void setFull_address(String full_address) {
-        this.full_address = full_address;
     }
 }
