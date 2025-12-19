@@ -1,12 +1,13 @@
 package com.monolatte.kontur.model.SQL;
 
 import com.monolatte.kontur.model.Notes.Manufacturer;
+import com.monolatte.kontur.model.Notes.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
+public class ManufacturerDAO implements ISQLDAOSearchable<Manufacturer> {
     final private String _tableName;
     final private Connection _connect;
 
@@ -122,6 +123,24 @@ public class ManufacturerDAO implements ISQLDAO<Manufacturer> {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
+        }
+        return notes;
+    }
+
+    @Override
+    public List<Manufacturer> search(String columnDescription, String searchTerm) {
+        List<Manufacturer> notes = new ArrayList<>();
+        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
+        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setString(1, "%" + searchTerm + "%");
+            try(ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    notes.add(mapResultSetToManufacturer(rs));
+                }
+            }
+        } catch (SQLException e) {
+            // Логирование и обработка ошибок базы данных
+            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
         }
         return notes;
     }
