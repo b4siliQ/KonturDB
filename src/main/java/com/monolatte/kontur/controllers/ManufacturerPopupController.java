@@ -31,12 +31,6 @@ public class ManufacturerPopupController {
     @FXML
     Button showManufacturerButton;
     @FXML
-    Button addManufacturerButton;
-    @FXML
-    Button addComponentButton;
-    @FXML
-    Button removeComponentButton;
-    @FXML
     TableView<ComponentProperty> componentsTable;
     @FXML
     TableColumn<ComponentProperty, Long> idTableColumn;
@@ -101,50 +95,6 @@ public class ManufacturerPopupController {
 
         this._loadDataIntoTable();
         this._refillManufacturerFields();
-    }
-
-    @FXML
-    public void onAddManufacturerButtonClicked() {
-
-    }
-
-    @FXML
-    public void onAddComponentButtonClicked() {
-        try {
-            var popupLoader = new FXMLLoader(ManufacturerPopupController.class.getResource(
-                    "/com/monolatte/kontur/SearchPopup.fxml"
-            ));
-            Parent root = popupLoader.load();
-            SearchPopupController<Component> popupController = popupLoader.getController();
-
-            popupController.initDAO(DAOFactory.DAOType.COMPONENT);
-            popupController.initData(ComponentColumns.values());
-
-            Stage newStage = new Stage();
-            Scene newScene = new Scene(root);
-            newStage.setScene(newScene);
-            popupController.setStage(newStage);
-
-            newStage.setTitle("Component Searcher");
-            newStage.setResizable(false);
-            newStage.initModality(Modality.APPLICATION_MODAL);
-            newStage.showAndWait();
-
-            var result = popupController.getChosenObject();
-            if (result != null) {
-                this._manufacturerUsageDAO.addNote(new Manufacturer_Usage(
-                        result.getId(),
-                        this._currentManufacturer.getId()
-                ));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @FXML
-    public void onRemoveComponentButtonClicked() {
-
     }
 
     private void _refillManufacturerFields() {

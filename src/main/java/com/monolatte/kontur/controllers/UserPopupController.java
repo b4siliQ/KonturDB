@@ -30,12 +30,6 @@ public class UserPopupController {
     @FXML
     Button showUserButton;
     @FXML
-    Button addUserButton;
-    @FXML
-    Button addProjectButton;
-    @FXML
-    Button removeProjectButton;
-    @FXML
     TableView<ProjectProperty> projectTable;
     @FXML
     TableColumn<ProjectProperty, Long> idTableColumn;
@@ -100,53 +94,6 @@ public class UserPopupController {
             throw new RuntimeException(e);
         }
 
-
-    }
-
-    @FXML
-    public void onAddUserButtonClicked() {
-
-    }
-
-    @FXML
-    public void onAddProjectButtonClicked() {
-        try {
-            var popupLoader = new FXMLLoader(UserPopupController.class.getResource(
-                    "/com/monolatte/kontur/SearchPopup.fxml"
-            ));
-            Parent root = popupLoader.load();
-            SearchPopupController<Project> popupController = popupLoader.getController();
-
-            popupController.initDAO(DAOFactory.DAOType.PROJECT);
-            popupController.initData(ProjectColumns.values());
-
-            Stage newStage = new Stage();
-            Scene newScene = new Scene(root);
-            newStage.setScene(newScene);
-            popupController.setStage(newStage);
-
-            newStage.setTitle("Project Searcher");
-            newStage.setResizable(false);
-            newStage.initModality(Modality.APPLICATION_MODAL);
-            newStage.showAndWait();
-
-            var result = popupController.getChosenObject();
-            if (result != null) {
-                this._userUsageDAO.addNote(new User_usage(
-                        result.getId(),
-                        this._currentUser.getId()
-                ));
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        this._loadDataIntoTable();
-    }
-
-    @FXML
-    public void onRemoveProjectButtonClicked() {
 
     }
 
