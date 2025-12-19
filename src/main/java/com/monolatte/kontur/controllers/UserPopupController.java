@@ -45,6 +45,8 @@ public class UserPopupController {
     TableColumn<ProjectProperty, Integer> qantityTableColumn;
     @FXML
     TableColumn<ProjectProperty, Float> totalPriceTableColumn;
+    @FXML
+    TableColumn<ProjectProperty, Button> componentsColumn; // ! Неточная реализация
 
     private final ProjectDAO _projectDAO = SQLTableManager.getInstance().getProjectManager();
     private final UserContactDAO _userContactDAO = SQLTableManager.getInstance().getUserContactDAO();

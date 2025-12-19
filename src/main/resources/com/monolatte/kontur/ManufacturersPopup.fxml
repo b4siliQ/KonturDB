@@ -70,6 +70,7 @@
             <TableColumn fx:id="quantityTableColumn" prefWidth="75.0" text="Quantity" />
             <TableColumn fx:id="finalCostTableColumn" prefWidth="75.0" text="Final cost" />
             <TableColumn fx:id="projectListTableColumn" prefWidth="75.0" text="Projects list" />
+            <TableColumn fx:id="projectsTableColumn" prefWidth="75.0" text="Projects" />
         </columns>
       </TableView>
    </children>

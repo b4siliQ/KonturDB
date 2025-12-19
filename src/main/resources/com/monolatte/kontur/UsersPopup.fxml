@@ -70,6 +70,7 @@
             <TableColumn fx:id="componentsListTableColumn" prefWidth="75.0" text="Components list" />
             <TableColumn fx:id="qantityTableColumn" prefWidth="75.0" text="Components Qantity" />
             <TableColumn fx:id="totalPriceTableColumn" prefWidth="75.0" text="Total pice" />
+            <TableColumn fx:id="componentsColumn" prefWidth="75.0" text="Components" />
         </columns>
       </TableView>
    </children>

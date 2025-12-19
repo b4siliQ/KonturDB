@@ -4,6 +4,7 @@ import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Enums.ManufacturerColumns;
 import com.monolatte.kontur.model.Notes.Properties.ComponentProperty;
+import com.monolatte.kontur.model.Notes.Properties.ProjectProperty;
 import com.monolatte.kontur.model.SQL.*;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.collections.FXCollections;
@@ -44,6 +45,8 @@ public class ManufacturerPopupController {
     TableColumn<ComponentProperty, Integer> quantityTableColumn;
     @FXML
     TableColumn<ComponentProperty, Float> finalCostTableColumn;
+    @FXML
+    TableColumn<ProjectProperty, Button> projectsTableColumn; // ! Неточная реализация
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
     private final ManufacturerAdressesDAO _manufacturerAddressDAO = SQLTableManager.getInstance().getManufacturerAddressDAO();
