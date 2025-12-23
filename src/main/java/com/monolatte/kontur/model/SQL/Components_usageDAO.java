@@ -133,7 +133,7 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
     }
 
     public List<Project> getProjectsByComponentId(long componentId) {
-        List<Project> manufacturers = new ArrayList<>();
+        List<Project> projects = new ArrayList<>();
         String sqlRequest = String.format(
                 "SELECT p.* FROM Projects p " +
                         "INNER JOIN %s mu ON p.id = mu.project_id " +
@@ -149,20 +149,20 @@ public class Components_usageDAO implements ISQLDAO<Component_usage> {
                     // Используем ваш существующий метод маппинга
                     Project project = new Project(
                             //rs.getLong("project_id"),
-                            rs.getString("name"),
+                            rs.getString("project_name"),
                             rs.getString("start_date"),
                             rs.getString("end_date"),
                             rs.getString("status"));
 
                     project.setId(rs.getLong("id"));
-                    manufacturers.add(project);
+                    projects.add(project);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Ошибка при получении проекта для компонента: " + e.getMessage(), e);
         }
 
-        return manufacturers;
+        return projects;
     }
 
 
