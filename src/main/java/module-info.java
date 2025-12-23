@@ -8,5 +8,6 @@ module com.monolatte.kontur {
 
 
     opens com.monolatte.kontur.controllers to javafx.fxml;
+    opens com.monolatte.kontur.controllers.subs to javafx.fxml;
     exports com.monolatte.kontur;
 }
