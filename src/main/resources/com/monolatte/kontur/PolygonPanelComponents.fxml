@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
   <tabs>
     <Tab text="Примеры запросов ">
          <content>
@@ -218,6 +218,7 @@
                         </GridPane>
                         <VBox HBox.hgrow="ALWAYS">
                            <children>
+                              <Button fx:id="requestButton" mnemonicParsing="false" text="Выполнить запрос" />
                               <Label text="Список проектов">
                                  <padding>
                                     <Insets bottom="5.0" top="10.0" />
