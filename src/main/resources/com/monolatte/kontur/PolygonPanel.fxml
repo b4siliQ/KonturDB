@@ -212,6 +212,7 @@
                         </GridPane>
                         <VBox HBox.hgrow="ALWAYS">
                            <children>
+                              <Button fx:id="requestButton" mnemonicParsing="false" text="Выполнить запрос" />
                               <Label text="Список компонентов">
                                  <padding>
                                     <Insets bottom="5.0" top="10.0" />

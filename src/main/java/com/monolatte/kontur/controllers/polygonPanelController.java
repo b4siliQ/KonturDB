@@ -22,8 +22,7 @@ public class polygonPanelController {
 
     // --- Вкладка 2: Полная запись Select ---
     @FXML private TextField idProjectTextField1;
-    @FXML private CheckBox projectsCostCheckBox;
-    @FXML private CheckBox sortedByCostCheckBox;
+    @FXML private CheckBox projectsCostCheckBox, sortedByCostCheckBox;
     @FXML private TextField projectsCostTextField;
     @FXML private RadioButton costRadioButton, showProjectsRadioButton, withoutDetailsRadioButton;
     @FXML private Button showResult1;
@@ -35,15 +34,16 @@ public class polygonPanelController {
     @FXML private Button showResultButton2;
     @FXML private AnchorPane tableContainer3;
 
-    // --- Вкладка 4: Запросы изменения данных ---
+    // --- Вкладка 4: Запросы изменения данных (DML) ---
     @FXML private RadioButton addProjectsDataRadioButton, changeProjectsDataRadioButton, deleteProjectsDataRadioButton;
     @FXML private TextField idProjectTextField3, nameProjectTextField, startDateProjectTextField, endDateProjectTextField, statusProjectTextField;
     @FXML private CheckBox completeProjectCheckBox;
     @FXML private ListView<Component> projectsComponentsListVuew;
-    @FXML private Button showResultButton3;
+    @FXML private Button requestButton;      // Кнопка "Выполнить запрос"
+    @FXML private Button showResultButton3;  // Кнопка "Показать список проектов"
     @FXML private AnchorPane tableContainer4;
 
-    // --- DAO ---
+    // --- DAO (Менеджеры таблиц) ---
     private final ProjectDAO _projectDAO = SQLTableManager.getInstance().getProjectManager();
     private final UserDAO _userDAO = SQLTableManager.getInstance().getUserDAO();
     private final Components_usageDAO _componentsUsageDAO = SQLTableManager.getInstance().getComponentsUsageManager();
@@ -53,36 +53,134 @@ public class polygonPanelController {
     public void initialize() {
         _setupToggleGroups();
 
-        projectsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "projects"));
-        usersRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "users"));
-        usersContactsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "contacts"));
+        // Настройка событий для вкладок
+        _setupSelectionTabs();
+        _setupModificationTab();
 
-        showResult1.setOnAction(_ -> _handleFullSelect());
-        showResultButton2.setOnAction(_ -> _handleSubqueries());
+        // Установка начального отображения
+        if (projectsRadioButton != null) {
+            projectsRadioButton.setSelected(true);
+            _loadDataToContainer(tableContainer1, "projects");
+        }
+    }
 
-        idProjectTextField3.textProperty().addListener((_, _, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) _autoFillProjectData(newValue);
-            else _clearModifyFields();
-        });
-        showResultButton3.setOnAction(_ -> _loadDataToContainer(tableContainer4, "projects"));
+    // --- ЛОГИКА ВКЛАДКИ 4 (Изменение данных) ---
+    private void _setupModificationTab() {
+        // 1. Автозаполнение полей при вводе ID
+        if (idProjectTextField3 != null) {
+            idProjectTextField3.textProperty().addListener((_, _, newValue) -> {
+                if (newValue != null && !newValue.isEmpty()) _autoFillProjectData(newValue);
+                else _clearModifyFields();
+            });
+        }
 
-        projectsRadioButton.setSelected(true);
-        _loadDataToContainer(tableContainer1, "projects");
+        // 2. Кнопка ВЫПОЛНИТЬ ЗАПРОС (INSERT, UPDATE, DELETE)
+        if (requestButton != null) {
+            requestButton.setOnAction(_ -> {
+                _executeModification();
+                _loadDataToContainer(tableContainer4, "projects"); // Авто-обновление таблицы после действия
+            });
+        }
+
+        // 3. Кнопка ПОКАЗАТЬ СПИСОК ПРОЕКТОВ (ПРОСТО SELECT)
+        if (showResultButton3 != null) {
+            showResultButton3.setOnAction(_ -> _loadDataToContainer(tableContainer4, "projects"));
+        }
+    }
+
+    private void _executeModification() {
+        try {
+            // Собираем данные из полей
+            String name = nameProjectTextField.getText();
+            String start = startDateProjectTextField.getText();
+            String end = endDateProjectTextField.getText();
+            String status = completeProjectCheckBox.isSelected() ? "Completed" : statusProjectTextField.getText();
+
+            // Если поле статуса пустое, а чекбокс не нажат, поставим заглушку
+            if (status.isEmpty()) status = "Draft";
+
+            Project project = new Project(name, start, end, status);
+
+            long id = 0;
+            if (!idProjectTextField3.getText().isEmpty()) {
+                id = Long.parseLong(idProjectTextField3.getText());
+            }
+
+            // Выбираем действие в зависимости от радиокнопки
+            if (addProjectsDataRadioButton.isSelected()) {
+                _projectDAO.addNote(project);
+            } else if (changeProjectsDataRadioButton.isSelected() && id != 0) {
+                project.setId(id);
+                _projectDAO.updateNote(project);
+            } else if (deleteProjectsDataRadioButton.isSelected() && id != 0) {
+                _projectDAO.deleteNote(id);
+            } else {
+                System.out.println("Хозяин, вы не выбрали тип операции или не указали ID!");
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка выполнения DML запроса: " + e.getMessage());
+        }
+    }
+
+    // --- ОБЩАЯ ЛОГИКА ТАБЛИЦ (Вывод всех полей) ---
+    private void _loadDataToContainer(AnchorPane container, String type) {
+        if (container == null) return;
+        TableView<Object> table = new TableView<>();
+        ObservableList<Object> data = FXCollections.observableArrayList();
+
+        switch (type) {
+            case "projects" -> {
+                _setupProjectColumns(table);     // ID, Имя
+                _addProjectDetailColumns(table); // Статус, Начало, Конец
+                _projectDAO.getAllNotes().forEach(p -> data.add(new ProjectProperty(p)));
+            }
+            case "users" -> {
+                _setupUserColumns(table);
+                _userDAO.getAllNotes().forEach(u -> data.add(new UserProperty(new SimpleLongProperty(u.getId()), u)));
+            }
+            case "contacts" -> {
+                _setupContactColumns(table);
+                data.addAll(_userContactDAO.getAllNotes());
+            }
+        }
+        table.setItems(data);
+        _injectTable(container, table);
+    }
+
+    // --- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ КОЛОНОК ---
+    private void _setupProjectColumns(TableView<Object> table) {
+        TableColumn<Object, Long> idCol = new TableColumn<>("ID");
+        idCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).idProperty().asObject());
+        TableColumn<Object, String> nameCol = new TableColumn<>("Проект");
+        nameCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).nameProperty());
+        table.getColumns().setAll(idCol, nameCol);
+    }
+
+    private void _addProjectDetailColumns(TableView<Object> table) {
+        TableColumn<Object, String> statusCol = new TableColumn<>("Статус");
+        statusCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).statusProperty());
+        TableColumn<Object, String> startCol = new TableColumn<>("Начало");
+        startCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).startDateProperty());
+        TableColumn<Object, String> endCol = new TableColumn<>("Конец");
+        endCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).endDateProperty());
+        table.getColumns().addAll(statusCol, startCol, endCol);
+    }
+
+    // --- СИСТЕМНЫЕ МЕТОДЫ ---
+    private void _setupSelectionTabs() {
+        if (projectsRadioButton != null) {
+            projectsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "projects"));
+            usersRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "users"));
+            usersContactsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "contacts"));
+        }
+        if (showResult1 != null) showResult1.setOnAction(_ -> _handleFullSelect());
+        if (showResultButton2 != null) showResultButton2.setOnAction(_ -> _handleSubqueries());
     }
 
     private void _handleFullSelect() {
         TableView<Object> table = new TableView<>();
-        ObservableList<Object> data = FXCollections.observableArrayList();
-
         _setupProjectColumns(table);
-
-        if (!withoutDetailsRadioButton.isSelected()) {
-            TableColumn<Object, String> statusCol = new TableColumn<>("Статус");
-            statusCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).statusProperty());
-            TableColumn<Object, String> dateCol = new TableColumn<>("Дата начала");
-            dateCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).startDateProperty());
-            table.getColumns().addAll(statusCol, dateCol);
-        }
+        if (!withoutDetailsRadioButton.isSelected()) _addProjectDetailColumns(table);
 
         if (projectsCostCheckBox.isSelected()) {
             TableColumn<Object, Number> costCol = new TableColumn<>("Общая стоимость");
@@ -99,80 +197,35 @@ public class polygonPanelController {
         }
 
         List<ProjectProperty> propertyList = new ArrayList<>();
-        for (Project p : rawProjects) {
-            propertyList.add(new ProjectProperty(p));
-        }
+        rawProjects.forEach(p -> propertyList.add(new ProjectProperty(p)));
 
-        // Фильтрация по минимальной цене
-        String minPriceText = projectsCostTextField.getText();
-        if (minPriceText != null && !minPriceText.isEmpty()) {
-            try {
-                float minPrice = Float.parseFloat(minPriceText);
-                propertyList.removeIf(p -> p.totalComponentPriceProperty().get() < minPrice);
-            } catch (NumberFormatException ignored) {}
-        }
+        // Фильтрация и Сортировка по цене
+        _applyFiltersAndSort(propertyList);
 
-        // --- ИСПРАВЛЕННАЯ ЛОГИКА СОРТИРОВКИ ---
-        Comparator<ProjectProperty> comparator = null;
-
-        if (costRadioButton.isSelected()) {
-            // Сортировка по статусу (алфавитный порядок)
-            comparator = Comparator.comparing(p -> p.statusProperty().get(), Comparator.nullsLast(String::compareTo));
-
-            // Если при этом выбрана и убывающая цена, добавляем второй уровень сортировки
-            if (sortedByCostCheckBox.isSelected()) {
-                comparator = comparator.thenComparing((p1, p2) ->
-                        Float.compare(p2.totalComponentPriceProperty().get(), p1.totalComponentPriceProperty().get()));
-            }
-        } else if (sortedByCostCheckBox.isSelected()) {
-            // Только по убыванию цены
-            comparator = (p1, p2) -> Float.compare(p2.totalComponentPriceProperty().get(), p1.totalComponentPriceProperty().get());
-        }
-
-        if (comparator != null) {
-            propertyList.sort(comparator);
-        }
-
-        data.addAll(propertyList);
-        table.setItems(data);
+        table.setItems(FXCollections.observableArrayList(propertyList));
         _injectTable(tableContainer2, table);
     }
 
-    private void _handleSubqueries() {
-        TableView<Object> table = new TableView<>();
-        _setupProjectColumns(table);
-        List<Project> results = uncorrelatedQueryRadioButton.isSelected()
-                ? _projectDAO.getProjectsWithAboveAverageCost()
-                : _projectDAO.getProjectsWithExpensiveComponents();
-        ObservableList<Object> data = FXCollections.observableArrayList();
-        results.forEach(p -> data.add(new ProjectProperty(p)));
-        table.setItems(data);
-        _injectTable(tableContainer3, table);
-    }
-
-    private void _loadDataToContainer(AnchorPane container, String type) {
-        TableView<Object> table = new TableView<>();
-        ObservableList<Object> data = FXCollections.observableArrayList();
-        if (type.equals("projects")) {
-            _setupProjectColumns(table);
-            _projectDAO.getAllNotes().forEach(p -> data.add(new ProjectProperty(p)));
-        } else if (type.equals("users")) {
-            _setupUserColumns(table);
-            _userDAO.getAllNotes().forEach(u -> data.add(new UserProperty(new SimpleLongProperty(u.getId()), u)));
-        } else if (type.equals("contacts")) {
-            _setupContactColumns(table);
-            data.addAll(_userContactDAO.getAllNotes());
+    private void _applyFiltersAndSort(List<ProjectProperty> list) {
+        // Фильтр по цене
+        String minPriceStr = projectsCostTextField.getText();
+        if (minPriceStr != null && !minPriceStr.isEmpty()) {
+            try {
+                float minPrice = Float.parseFloat(minPriceStr);
+                list.removeIf(p -> p.totalComponentPriceProperty().get() < minPrice);
+            } catch (NumberFormatException ignored) {}
         }
-        table.setItems(data);
-        _injectTable(container, table);
-    }
-
-    private void _setupProjectColumns(TableView<Object> table) {
-        TableColumn<Object, Long> idCol = new TableColumn<>("ID");
-        idCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).idProperty().asObject());
-        TableColumn<Object, String> nameCol = new TableColumn<>("Проект");
-        nameCol.setCellValueFactory(cd -> ((ProjectProperty)cd.getValue()).nameProperty());
-        table.getColumns().setAll(idCol, nameCol);
+        // Сортировка
+        Comparator<ProjectProperty> comp = null;
+        if (costRadioButton.isSelected()) {
+            comp = Comparator.comparing(p -> p.statusProperty().get(), Comparator.nullsLast(String::compareTo));
+            if (sortedByCostCheckBox.isSelected()) {
+                comp = comp.thenComparing((p1, p2) -> Float.compare(p2.totalComponentPriceProperty().get(), p1.totalComponentPriceProperty().get()));
+            }
+        } else if (sortedByCostCheckBox.isSelected()) {
+            comp = (p1, p2) -> Float.compare(p2.totalComponentPriceProperty().get(), p1.totalComponentPriceProperty().get());
+        }
+        if (comp != null) list.sort(comp);
     }
 
     private void _setupUserColumns(TableView<Object> table) {
@@ -191,6 +244,17 @@ public class polygonPanelController {
         table.getColumns().setAll(typeCol, valCol);
     }
 
+    private void _handleSubqueries() {
+        TableView<Object> table = new TableView<>();
+        _setupProjectColumns(table);
+        _addProjectDetailColumns(table);
+        List<Project> res = uncorrelatedQueryRadioButton.isSelected() ? _projectDAO.getProjectsWithAboveAverageCost() : _projectDAO.getProjectsWithExpensiveComponents();
+        ObservableList<Object> data = FXCollections.observableArrayList();
+        res.forEach(p -> data.add(new ProjectProperty(p)));
+        table.setItems(data);
+        _injectTable(tableContainer3, table);
+    }
+
     private void _autoFillProjectData(String id) {
         try {
             Project project = _projectDAO.getNoteById(Long.parseLong(id));
@@ -200,8 +264,7 @@ public class polygonPanelController {
                 endDateProjectTextField.setText(project.getEnd_date());
                 statusProjectTextField.setText(project.getStatus());
                 completeProjectCheckBox.setSelected("Completed".equalsIgnoreCase(project.getStatus()));
-                List<Component> components = _componentsUsageDAO.getComponentsByProjectId(project.getId());
-                projectsComponentsListVuew.setItems(FXCollections.observableArrayList(components));
+                projectsComponentsListVuew.setItems(FXCollections.observableArrayList(_componentsUsageDAO.getComponentsByProjectId(project.getId())));
             }
         } catch (Exception ignored) {}
     }
@@ -216,30 +279,18 @@ public class polygonPanelController {
     private void _injectTable(AnchorPane container, TableView<Object> table) {
         if (container == null) return;
         container.getChildren().setAll(table);
-        AnchorPane.setTopAnchor(table, 0.0);
-        AnchorPane.setBottomAnchor(table, 0.0);
-        AnchorPane.setLeftAnchor(table, 0.0);
-        AnchorPane.setRightAnchor(table, 0.0);
+        AnchorPane.setTopAnchor(table, 0.0); AnchorPane.setBottomAnchor(table, 0.0);
+        AnchorPane.setLeftAnchor(table, 0.0); AnchorPane.setRightAnchor(table, 0.0);
     }
 
     private void _setupToggleGroups() {
         ToggleGroup tg1 = new ToggleGroup();
-        projectsRadioButton.setToggleGroup(tg1);
-        usersRadioButton.setToggleGroup(tg1);
-        usersContactsRadioButton.setToggleGroup(tg1);
-
-        ToggleGroup tgSelectDetails = new ToggleGroup();
-        costRadioButton.setToggleGroup(tgSelectDetails);
-        showProjectsRadioButton.setToggleGroup(tgSelectDetails);
-        withoutDetailsRadioButton.setToggleGroup(tgSelectDetails);
-
-        ToggleGroup tgSubqueries = new ToggleGroup();
-        correlatedQueryRadioButton.setToggleGroup(tgSubqueries);
-        uncorrelatedQueryRadioButton.setToggleGroup(tgSubqueries);
-
-        ToggleGroup tgMod = new ToggleGroup();
-        addProjectsDataRadioButton.setToggleGroup(tgMod);
-        changeProjectsDataRadioButton.setToggleGroup(tgMod);
-        deleteProjectsDataRadioButton.setToggleGroup(tgMod);
+        if (projectsRadioButton != null) { projectsRadioButton.setToggleGroup(tg1); usersRadioButton.setToggleGroup(tg1); usersContactsRadioButton.setToggleGroup(tg1); }
+        ToggleGroup tg2 = new ToggleGroup();
+        if (costRadioButton != null) { costRadioButton.setToggleGroup(tg2); showProjectsRadioButton.setToggleGroup(tg2); withoutDetailsRadioButton.setToggleGroup(tg2); }
+        ToggleGroup tg3 = new ToggleGroup();
+        if (correlatedQueryRadioButton != null) { correlatedQueryRadioButton.setToggleGroup(tg3); uncorrelatedQueryRadioButton.setToggleGroup(tg3); }
+        ToggleGroup tg4 = new ToggleGroup();
+        if (addProjectsDataRadioButton != null) { addProjectsDataRadioButton.setToggleGroup(tg4); changeProjectsDataRadioButton.setToggleGroup(tg4); deleteProjectsDataRadioButton.setToggleGroup(tg4); }
     }
 }
