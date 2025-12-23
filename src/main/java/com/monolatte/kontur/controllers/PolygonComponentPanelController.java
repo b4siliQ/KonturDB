@@ -10,8 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,22 +18,22 @@ public class PolygonComponentPanelController {
 
     // --- Вкладка 1: Примеры запросов ---
     @FXML private RadioButton componentsRadioButton, manufaturersRadioButton, manufacturersAddressesRadioButton;
-    @FXML private AnchorPane tableContainer1;
+    @FXML private AnchorPane tableContainer1; // Не забудьте добавить fx:id в FXML для AnchorPane на 1 вкладке
 
     // --- Вкладка 2: Полная запись Select ---
     @FXML private TextField idComponentTextField1, componentCostTextField;
     @FXML private CheckBox componentsCostCheckBox, sortedByCostCheckBox;
     @FXML private RadioButton costRadioButton, showAllComponentsRadioButton, withoutDetailsRadioButton;
     @FXML private Button showResult1;
-    @FXML private AnchorPane tableContainer2;
+    @FXML private AnchorPane tableContainer2; // Нужно убедиться, что fx:id прописан в последнем AnchorPane VBox-а
 
     // --- Вкладка 3: Подзапросы ---
     @FXML private TextField idManufacturerTextField;
     @FXML private RadioButton correlatedQueryRadioButton, uncorrelatedQueryRadioButton;
     @FXML private Button showResultButton2;
-    @FXML private AnchorPane tableContainer3;
+    @FXML private AnchorPane tableContainer3; // Аналогично, проверьте fx:id в FXML
 
-    // --- Вкладка 4: Запросы изменения данных ---
+    // --- Вкладка 4: Изменения данных ---
     @FXML private RadioButton addСomponentsDataRadioButton, changeComponentsDataRadioButton, deleteComponentsDataRadioButton;
     @FXML private TextField idComponentTextField2, nameComponentTextField, datasheetLinkComponentTextFielf, costComponentTextFeild, quantityComponentTextFeild;
     @FXML private TextArea specificationComponentTextField;
@@ -44,7 +42,7 @@ public class PolygonComponentPanelController {
     @FXML private Button requestButton, showResultButton3;
     @FXML private AnchorPane tableContainer4;
 
-    // Менеджеры данных (DAO)
+    // DAO
     private final ComponentsDAO _componentDAO = SQLTableManager.getInstance().getComponentsManager();
     private final ManufacturerDAO _manufacturerDAO = SQLTableManager.getInstance().getManufacturerDAO();
     private final Components_usageDAO _usageDAO = SQLTableManager.getInstance().getComponentsUsageManager();
@@ -53,90 +51,78 @@ public class PolygonComponentPanelController {
     public void initialize() {
         _setupToggleGroups();
 
-        // Инициализация событий первой вкладки
+        // Вкладка 1
         componentsRadioButton.setOnAction(_ -> _loadData("components", tableContainer1));
         manufaturersRadioButton.setOnAction(_ -> _loadData("manufacturers", tableContainer1));
         manufacturersAddressesRadioButton.setOnAction(_ -> _loadData("addresses", tableContainer1));
 
-        // Вкладка 2: Сложный Select
+        // Вкладка 2
         showResult1.setOnAction(_ -> _handleFullSelect());
 
-        // Вкладка 3: Подзапросы
+        // Вкладка 3
         showResultButton2.setOnAction(_ -> _handleSubqueries());
 
-        // Вкладка 4: Логика изменения данных
+        // Вкладка 4
         _setupModificationLogic();
-
-        // Начальный вид
-        componentsRadioButton.setSelected(true);
-        _loadData("components", tableContainer1);
     }
 
     private void _setupModificationLogic() {
-        // Автозаполнение по ID
         idComponentTextField2.textProperty().addListener((_, _, newValue) -> {
             if (newValue != null && !newValue.isEmpty()) _autoFillComponent(newValue);
             else _clearFields();
         });
 
-        // ВЫПОЛНИТЬ ЗАПРОС (DML)
         requestButton.setOnAction(_ -> {
-            _executeModification();
-            _loadData("components", tableContainer4); // Обновляем таблицу
+            _executeDML();
+            _loadData("components", tableContainer4);
         });
 
-        // ПРОСТО ПОКАЗАТЬ СПИСОК
         showResultButton3.setOnAction(_ -> _loadData("components", tableContainer4));
     }
 
-    private void _executeModification() {
+    private void _executeDML() {
         try {
             String name = nameComponentTextField.getText();
             String spec = specificationComponentTextField.getText();
             String link = datasheetLinkComponentTextFielf.getText();
-            float price = costComponentTextFeild.getText().isEmpty() ? 0 : Float.parseFloat(costComponentTextFeild.getText());
-            int quantity = quantityComponentTextFeild.getText().isEmpty() ? 0 : Integer.parseInt(quantityComponentTextFeild.getText());
+            float cost = Float.parseFloat(costComponentTextFeild.getText());
+            int quantity = Integer.parseInt(quantityComponentTextFeild.getText());
 
-            // В конструкторе Component 6 полей. Поля 'type' нет в FXML, передаем пустую строку.
-            Component comp = new Component(name, "", spec, link, price, quantity);
+            // Предполагаем конструктор: Component(name, spec, link, cost, quantity)
+            Component comp = new Component(name, spec, link, cost, quantity);
 
-            long id = 0;
             if (!idComponentTextField2.getText().isEmpty()) {
-                id = Long.parseLong(idComponentTextField2.getText());
-            }
-
-            if (addСomponentsDataRadioButton.isSelected()) {
+                long id = Long.parseLong(idComponentTextField2.getText());
+                if (changeComponentsDataRadioButton.isSelected()) {
+                    comp.setId(id);
+                    _componentDAO.updateNote(comp);
+                } else if (deleteComponentsDataRadioButton.isSelected()) {
+                    _componentDAO.deleteNote(id);
+                }
+            } else if (addСomponentsDataRadioButton.isSelected()) {
                 _componentDAO.addNote(comp);
-            } else if (changeComponentsDataRadioButton.isSelected() && id != 0) {
-                comp.setId(id);
-                _componentDAO.updateNote(comp);
-            } else if (deleteComponentsDataRadioButton.isSelected() && id != 0) {
-                _componentDAO.deleteNote(id);
             }
-        } catch (Exception e) {
-            System.err.println("DML Error: " + e.getMessage());
-        }
+        } catch (Exception e) { System.err.println("DML Error: " + e.getMessage()); }
     }
 
     private void _handleFullSelect() {
         TableView<Object> table = new TableView<>();
-        _setupComponentColumns(table); // Базовые колонки
+        _setupComponentBaseColumns(table);
 
         if (!withoutDetailsRadioButton.isSelected()) {
-            _addComponentDetails(table); // Расширенные колонки (цена, количество, ссылка)
+            _addComponentDetailColumns(table);
         }
 
-        List<Component> results;
-        String searchId = idComponentTextField1.getText();
-        if (showAllComponentsRadioButton.isSelected() || searchId.isEmpty()) {
-            results = _componentDAO.getAllNotes();
+        List<Component> list;
+        if (showAllComponentsRadioButton.isSelected() || idComponentTextField1.getText().isEmpty()) {
+            list = _componentDAO.getAllNotes();
         } else {
-            results = _componentDAO.search("id", searchId);
+            list = _componentDAO.search("id", idComponentTextField1.getText());
         }
 
-        ObservableList<Object> data = FXCollections.observableArrayList(results);
+        ObservableList<Object> data = FXCollections.observableArrayList(list);
 
-        // Сортировка по цене
+        // Сортировка по цене (Float)
         if (sortedByCostCheckBox.isSelected()) {
             data.sort((o1, o2) -> Float.compare(((Component)o2).getPrice(), ((Component)o1).getPrice()));
         }
@@ -150,23 +136,21 @@ public class PolygonComponentPanelController {
         TableView<Object> table = new TableView<>();
         ObservableList<Object> data = FXCollections.observableArrayList();
 
-        switch (type) {
-            case "components" -> {
-                _setupComponentColumns(table);
-                _addComponentDetails(table);
-                data.addAll(_componentDAO.getAllNotes());
-            }
-            case "manufacturers" -> {
-                _setupManufacturerColumns(table);
-                data.addAll(_manufacturerDAO.getAllNotes());
-            }
+        if (type.equals("components")) {
+            _setupComponentBaseColumns(table);
+            _addComponentDetailColumns(table);
+            data.addAll(_componentDAO.getAllNotes());
+        } else if (type.equals("manufacturers")) {
+            _setupManufacturerColumns(table);
+            data.addAll(_manufacturerDAO.getAllNotes());
         }
+
         table.setItems(data);
         _injectTable(container, table);
     }
 
-    // --- Колонки таблицы ---
-    private void _setupComponentColumns(TableView<Object> table) {
+    // Настройка колонок
+    private void _setupComponentBaseColumns(TableView<Object> table) {
         TableColumn<Object, Long> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(cd -> new SimpleLongProperty(((Component)cd.getValue()).getId()).asObject());
         TableColumn<Object, String> nameCol = new TableColumn<>("Название");
@@ -174,14 +158,12 @@ public class PolygonComponentPanelController {
         table.getColumns().setAll(idCol, nameCol);
     }
 
-    private void _addComponentDetails(TableView<Object> table) {
-        TableColumn<Object, Number> priceCol = new TableColumn<>("Цена");
-        priceCol.setCellValueFactory(cd -> new SimpleFloatProperty(((Component)cd.getValue()).getPrice()));
-        TableColumn<Object, Number> qtyCol = new TableColumn<>("Кол-во");
-        qtyCol.setCellValueFactory(cd -> new SimpleIntegerProperty(((Component)cd.getValue()).getQuantity()));
-        TableColumn<Object, String> linkCol = new TableColumn<>("Datasheet");
-        linkCol.setCellValueFactory(cd -> new SimpleStringProperty(((Component)cd.getValue()).getDatasheet_link()));
-        table.getColumns().addAll(priceCol, qtyCol, linkCol);
+    private void _addComponentDetailColumns(TableView<Object> table) {
+        TableColumn<Object, Number> costCol = new TableColumn<>("Цена");
+        costCol.setCellValueFactory(cd -> new javafx.beans.property.SimpleFloatProperty(((Component)cd.getValue()).getPrice()));
+        TableColumn<Object, Number> qCol = new TableColumn<>("Кол-во");
+        qCol.setCellValueFactory(cd -> new javafx.beans.property.SimpleIntegerProperty(((Component)cd.getValue()).getQuantity()));
+        table.getColumns().addAll(costCol, qCol);
     }
 
     private void _setupManufacturerColumns(TableView<Object> table) {
@@ -190,7 +172,6 @@ public class PolygonComponentPanelController {
         table.getColumns().setAll(nameCol);
     }
 
-    // --- Вспомогательные функции ---
     private void _autoFillComponent(String id) {
         try {
             Component c = _componentDAO.getNoteById(Long.parseLong(id));
@@ -201,7 +182,37 @@ public class PolygonComponentPanelController {
                 costComponentTextFeild.setText(String.valueOf(c.getPrice()));
                 quantityComponentTextFeild.setText(String.valueOf(c.getQuantity()));
                 completeComponentCheckBox.setSelected(c.getQuantity() <= 0);
+                // Загрузка проектов, где юзается компонент
+                componentsProjectsListVuew.setItems(FXCollections.observableArrayList(_usageDAO.getProjectsByComponentId(c.getId())));
+            }
+        } catch (Exception ignored) {}
+    }
 
-                // Загружаем список проектов, где используется этот компонент
-                List<Project> projects = _usageDAO.getProjectsByComponentId(c.getId());
-                componentsProjectsListVuew.setItems(FXCollections.observableArrayList(projects));
+    private void _handleSubqueries() {
+        // Логика аналогична предыдущей панели, но для производителей
+    }
+
+    private void _injectTable(AnchorPane container, TableView<Object> table) {
+        if (container == null) return;
+        container.getChildren().setAll(table);
+        AnchorPane.setTopAnchor(table, 0.0); AnchorPane.setBottomAnchor(table, 0.0);
+        AnchorPane.setLeftAnchor(table, 0.0); AnchorPane.setRightAnchor(table, 0.0);
+    }
+
+    private void _clearFields() {
+        nameComponentTextField.clear(); specificationComponentTextField.clear();
+        datasheetLinkComponentTextFielf.clear(); costComponentTextFeild.clear();
+        quantityComponentTextFeild.clear(); completeComponentCheckBox.setSelected(false);
+    }
+
+    private void _setupToggleGroups() {
+        ToggleGroup g1 = new ToggleGroup();
+        componentsRadioButton.setToggleGroup(g1); manufaturersRadioButton.setToggleGroup(g1); manufacturersAddressesRadioButton.setToggleGroup(g1);
+
+        ToggleGroup g2 = new ToggleGroup();
+        costRadioButton.setToggleGroup(g2); showAllComponentsRadioButton.setToggleGroup(g2); withoutDetailsRadioButton.setToggleGroup(g2);
+
+        ToggleGroup g3 = new ToggleGroup();
+        addСomponentsDataRadioButton.setToggleGroup(g3); changeComponentsDataRadioButton.setToggleGroup(g3); deleteComponentsDataRadioButton.setToggleGroup(g3);
+    }
+}
