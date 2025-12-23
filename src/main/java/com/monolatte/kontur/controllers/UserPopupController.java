@@ -1,8 +1,10 @@
 package com.monolatte.kontur.controllers;
 
+import com.monolatte.kontur.controllers.subs.ComponentTableController;
 import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ProjectColumns;
 import com.monolatte.kontur.model.Notes.Enums.UserColumns;
+import com.monolatte.kontur.model.Notes.Properties.ComponentProperty;
 import com.monolatte.kontur.model.Notes.Properties.ProjectProperty;
 import com.monolatte.kontur.model.SQL.*;
 import javafx.collections.FXCollections;
@@ -46,7 +48,7 @@ public class UserPopupController {
     @FXML
     TableColumn<ProjectProperty, Float> totalPriceTableColumn;
     @FXML
-    TableColumn<ProjectProperty, Button> componentsColumn; // ! Неточная реализация
+    TableColumn<ProjectProperty, Void> componentsColumn;
 
     private final ProjectDAO _projectDAO = SQLTableManager.getInstance().getProjectManager();
     private final UserContactDAO _userContactDAO = SQLTableManager.getInstance().getUserContactDAO();
@@ -119,6 +121,51 @@ public class UserPopupController {
         this.statusTableColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         this.qantityTableColumn.setCellValueFactory(cellData -> cellData.getValue().componentsQuantityProperty().asObject());
         this.totalPriceTableColumn.setCellValueFactory(cellData -> cellData.getValue().totalComponentPriceProperty().asObject());
+        this.componentsColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button btn = new Button("Компоненты");
+
+            {
+                btn.setMaxWidth(Double.MAX_VALUE);
+                btn.setOnAction(event -> {
+                    // Извлекаем объект ProjectProperty из текущей строки
+                    ProjectProperty item = getTableRow().getItem();
+                    if (item != null) {
+                        System.out.println("Выбран компонент: " + item.idProperty().get());
+                        // Здесь вызывайте метод для открытия проектов, передавая в него 'item'
+                        try {
+                            var popupLoader = new FXMLLoader(UserPopupController.class.getResource(
+                                    "/com/monolatte/kontur/subs/ComponentTable.fxml"
+                            ));
+                            Parent root = popupLoader.load();
+                            ComponentTableController popupController = popupLoader.getController();
+
+                            popupController.setId(item.idProperty().get());
+
+                            var popupStage = new Stage();
+                            var popupScene = new Scene(root);
+                            popupStage.setScene(popupScene);
+
+                            popupStage.setTitle("Current ID Component Table");
+                            popupStage.setResizable(false);
+                            popupStage.initModality(Modality.APPLICATION_MODAL);
+                            popupStage.showAndWait();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(btn);
+                }
+            }
+        });
     }
 
     private void _loadDataIntoTable() {

@@ -1,5 +1,6 @@
 package com.monolatte.kontur.controllers;
 
+import com.monolatte.kontur.controllers.subs.ProjectTableColumn;
 import com.monolatte.kontur.model.Notes.*;
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Enums.ManufacturerColumns;
@@ -46,7 +47,7 @@ public class ManufacturerPopupController {
     @FXML
     TableColumn<ComponentProperty, Float> finalCostTableColumn;
     @FXML
-    TableColumn<ComponentProperty, Void> projectsTableColumn; // ! Неточная реализация
+    TableColumn<ComponentProperty, Void> projectsTableColumn;
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
     private final ManufacturerAdressesDAO _manufacturerAddressDAO = SQLTableManager.getInstance().getManufacturerAddressDAO();
@@ -126,7 +127,7 @@ public class ManufacturerPopupController {
             return new SimpleFloatProperty(result).asObject();
         });
 
-        this.projectsTableColumn.setCellFactory(param -> new TableCell<ComponentProperty, Void>() {
+        this.projectsTableColumn.setCellFactory(param -> new TableCell<>() {
             private final Button btn = new Button("Проекты");
 
             {
@@ -137,6 +138,26 @@ public class ManufacturerPopupController {
                     if (item != null) {
                         System.out.println("Выбран компонент: " + item.idProperty().get());
                         // Здесь вызывайте метод для открытия проектов, передавая в него 'item'
+                        try {
+                            var popupLoader = new FXMLLoader(ManufacturerPopupController.class.getResource(
+                                    "/com/monolatte/kontur/subs/ProjectTable.fxml"
+                            ));
+                            Parent root = popupLoader.load();
+                            ProjectTableColumn popupController = popupLoader.getController();
+
+                            popupController.setId(item.idProperty().get());
+
+                            var popupStage = new Stage();
+                            var popupScene = new Scene(root);
+                            popupStage.setScene(popupScene);
+
+                            popupStage.setTitle("Current ID Project Table");
+                            popupStage.setResizable(false);
+                            popupStage.initModality(Modality.APPLICATION_MODAL);
+                            popupStage.showAndWait();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
             }
