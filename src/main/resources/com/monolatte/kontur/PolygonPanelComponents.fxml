@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.PolygonComponentPanelController">
+<TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.PolygonComponentPanelController">
   <tabs>
     <Tab text="Примеры запросов ">
          <content>
@@ -39,7 +39,7 @@
                            </padding></RadioButton>
                      </children>
                   </HBox>
-                  <AnchorPane VBox.vgrow="ALWAYS" />
+                  <AnchorPane fx:id="tableContainer1" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
          </content>
@@ -104,7 +104,7 @@
                      </children>
                   </GridPane>
                   <Button fx:id="showResult1" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Выполнить запрос" VBox.vgrow="ALWAYS" />
-                  <AnchorPane VBox.vgrow="ALWAYS" />
+                  <AnchorPane fx:id="tableContainer2" VBox.vgrow="ALWAYS" />
                </children></VBox>
          </content>
     </Tab>
@@ -125,7 +125,7 @@
                     </rowConstraints>
                      <children>
                         <TextField fx:id="idManufacturerTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID производителя  " GridPane.rowIndex="1">
+                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID компонента  " GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets left="10.0" />
                            </GridPane.margin></Label>
@@ -146,7 +146,7 @@
                      </children>
                   </VBox>
                   <Button fx:id="showResultButton2" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Выполнить подзапрос" />
-                  <AnchorPane VBox.vgrow="ALWAYS" />
+                  <AnchorPane fx:id="tableContainer3" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
          </content>
@@ -230,7 +230,7 @@
                      </children>
                   </HBox>
                   <Button fx:id="showResultButton3" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Показать список компонентов" />
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                  <AnchorPane fx:id="tableContainer4" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
          </content>

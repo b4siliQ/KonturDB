@@ -145,6 +145,60 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
         return notes;
     }
 
+    public Component getNoteById(long id) {
+        String sqlRequest = String.format("SELECT * FROM %s WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToComponent(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при поиске компонента по ID: " + e.getMessage());
+        }
+        return null; // Если ничего не найдено
+    }
+
+    // 1. Некоррелированный подзапрос: компоненты дороже средней цены
+    public List<Component> getComponentsAboveAveragePrice() {
+        List<Component> notes = new ArrayList<>();
+        // Внутренний запрос выполняется один раз независимо от внешнего
+        String sqlRequest = String.format(
+                "SELECT * FROM %s WHERE price > (SELECT AVG(price) FROM %s)",
+                this._tableName, this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                notes.add(mapResultSetToComponent(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка некоррелированного подзапроса: " + e.getMessage());
+        }
+        return notes;
+    }
+
+    // 2. Коррелированный подзапрос: компоненты, которые используются в проектах (связь через Usage)
+// Мы находим компоненты, для которых существует хотя бы одна запись в таблице связей
+    public List<Component> getUsedComponents() {
+        List<Component> notes = new ArrayList<>();
+        // Внутренний запрос ссылается на c.id из внешнего запроса
+        String sqlRequest = "SELECT * FROM Components c WHERE EXISTS (" +
+                "SELECT 1 FROM Component_Usage cu WHERE cu.component_id = c.id)";
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                notes.add(mapResultSetToComponent(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка коррелированного подзапроса: " + e.getMessage());
+        }
+        return notes;
+    }
+
     private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
         Component component = new Component(
         rs.getString("name"),

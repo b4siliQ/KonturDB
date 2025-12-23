@@ -46,7 +46,7 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
 
     @Override
     public void addNote(ManufacturerAddresses manufacturerAddresses) {
-        String sqlRequest = String.format("INSERT INTO %s (user_id, contact_type, contact_value) VALUES (?,?,?)", this._tableName);
+        String sqlRequest = String.format("INSERT INTO %s (manufacturer_id, contact_type, contact_value) VALUES (?,?,?)", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setLong(1, manufacturerAddresses.getManufacturer_id());
             pstmt.setString(2, manufacturerAddresses.getAddresses_type());
