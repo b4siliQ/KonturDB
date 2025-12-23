@@ -130,6 +130,80 @@ public class ProjectDAO implements ISQLDAOSearchable<Project> {
         return notes;
     }
 
+    public Project getNoteById(long id) {
+        String sql = String.format("SELECT * FROM %s WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Project project = new Project(
+                            rs.getString("project_name"),
+                            rs.getString("start_date"),
+                            rs.getString("end_date"),
+                            rs.getString("status")
+                    );
+                    project.setId(rs.getLong("id"));
+                    return project;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении проекта по ID: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // 2. НЕКОРРЕЛИРОВАННЫЙ подзапрос (Проекты, чья стоимость выше средней)
+    public List<Project> getProjectsWithAboveAverageCost() {
+        List<Project> projects = new ArrayList<>();
+        // Здесь мы соединяем Component_Usage с Components, чтобы получить цену (price)
+        String sql = String.format(
+                "SELECT * FROM %s WHERE id IN (" +
+                        "  SELECT cu.project_id FROM Component_Usage cu " +
+                        "  JOIN Components c ON cu.component_id = c.id " +
+                        "  GROUP BY cu.project_id " +
+                        "  HAVING SUM(c.price) > (" +
+                        "    SELECT AVG(total_cost) FROM (" +
+                        "      SELECT SUM(c2.price) as total_cost " +
+                        "      FROM Component_Usage cu2 " +
+                        "      JOIN Components c2 ON cu2.component_id = c2.id " +
+                        "      GROUP BY cu2.project_id" +
+                        "    )" +
+                        "  )" +
+                        ")", this._tableName);
+
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                projects.add(mapResultSetToProject(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка некоррелированного запроса: " + e.getMessage());
+        }
+        return projects;
+    }
+
+    // 3. КОРРЕЛИРОВАННЫЙ подзапрос (Проекты, где есть хоть один компонент дороже 1000)
+    public List<Project> getProjectsWithExpensiveComponents() {
+        List<Project> projects = new ArrayList<>();
+        // Связываем внешний проект p с его компонентами через EXISTS
+        String sql = String.format(
+                "SELECT * FROM %s p WHERE EXISTS (" +
+                        "  SELECT 1 FROM Component_Usage cu " +
+                        "  JOIN Components c ON cu.component_id = c.id " +
+                        "  WHERE cu.project_id = p.id AND c.price > 1000" +
+                        ")", this._tableName);
+
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                projects.add(mapResultSetToProject(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка коррелированного запроса: " + e.getMessage());
+        }
+        return projects;
+    }
+
     private Project mapResultSetToProject(ResultSet rs) throws SQLException {
         Project project = new Project(
         rs.getString("project_name"),

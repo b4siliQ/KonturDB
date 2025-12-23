@@ -75,5 +75,16 @@ public class MainPanelController {
             System.err.println("Alert! An error has occurred while loading user tab");
             throw new RuntimeException(e);
         }
+
+        try {
+            FXMLLoader aboutpolygonLoader = new FXMLLoader(MainPanelController.class.getResource(
+                    "/com/monolatte/kontur/PolygonPanel.fxml"
+            ));
+            Parent subview = aboutpolygonLoader.load();
+            this.aboutDevsTab.setContent(subview);
+        } catch (IOException e) {
+            System.err.println("Alert! An error has occurred while loading user tab");
+            throw new RuntimeException(e);
+        }
     }
 }
