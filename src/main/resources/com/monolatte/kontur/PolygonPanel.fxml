@@ -1,233 +1,161 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<TabPane prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.polygonPanelController">
-  <tabs>
-    <Tab text="Примеры запросов ">
-         <content>
-            <VBox>
-               <children>
-                  <HBox>
-                     <children>
-                        <RadioButton fx:id="projectsRadioButton" mnemonicParsing="false" text="Проекты" HBox.hgrow="ALWAYS">
-                           <padding>
-                              <Insets left="10.0" right="5.0" top="5.0" />
-                           </padding></RadioButton>
-                        <RadioButton fx:id="usersRadioButton" mnemonicParsing="false" text="Пользователи" HBox.hgrow="ALWAYS">
-                           <padding>
-                              <Insets right="5.0" top="5.0" />
-                           </padding></RadioButton>
-                        <RadioButton fx:id="usersContactsRadioButton" mnemonicParsing="false" text="Адреса пользователей" HBox.hgrow="ALWAYS">
-                           <padding>
-                              <Insets right="5.0" top="5.0" />
-                           </padding></RadioButton>
-                     </children>
-                  </HBox>
-                  <AnchorPane fx:id="tableContainer1" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-         </content>
-    </Tab>
-    <Tab text="Полная записть Select">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-               <children>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                  </GridPane>
-               </children></AnchorPane>
-      </content>
-         <content>
-            <VBox>
-               <children>
-                  <GridPane>
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                      <ColumnConstraints hgrow="NEVER" />
-                      <ColumnConstraints hgrow="NEVER" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                      <RowConstraints vgrow="NEVER" />
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                      <RowConstraints vgrow="NEVER" />
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                      <RowConstraints vgrow="NEVER" />
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                        <RowConstraints vgrow="NEVER" />
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                    </rowConstraints>
-                     <children>
-                        <Label maxWidth="1.7976931348623157E308" text="ID проекта" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="idProjectTextField1" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                        <CheckBox fx:id="projectsCostCheckBox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Стоимость проекта" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <CheckBox fx:id="sortedByCostCheckBox" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Сортировака по убыванию стоимости" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <TextField fx:id="projectsCostTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Детализация" GridPane.columnIndex="4" GridPane.rowIndex="1" />
-                        <RadioButton fx:id="costRadioButton" mnemonicParsing="false" text="Стоимость по статусу" GridPane.columnIndex="4" GridPane.rowIndex="3">
-                           <padding>
-                              <Insets bottom="5.0" />
-                           </padding>
-                        </RadioButton>
-                        <RadioButton fx:id="showProjectsRadioButton" mnemonicParsing="false" text="Вывод всех проектов" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                        <RadioButton fx:id="withoutDetailsRadioButton" mnemonicParsing="false" text="Без детализации" GridPane.columnIndex="4" GridPane.rowIndex="7">
-                           <padding>
-                              <Insets bottom="5.0" />
-                           </padding>
-                        </RadioButton>
-                     </children>
-                  </GridPane>
-                  <Button fx:id="showResult1" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Выполнить запрос" VBox.vgrow="ALWAYS" />
-                  <AnchorPane fx:id="tableContainer2" VBox.vgrow="ALWAYS" />
-               </children></VBox>
-         </content>
-    </Tab>
-      <Tab text="Пример подзапросов">
-         <content>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <GridPane>
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="NEVER" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                      <RowConstraints vgrow="ALWAYS" />
-                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="NEVER" />
-                        <RowConstraints vgrow="NEVER" />
-                    </rowConstraints>
-                     <children>
-                        <TextField fx:id="idProjectTextField2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID проекта " GridPane.rowIndex="1">
-                           <GridPane.margin>
-                              <Insets left="10.0" />
-                           </GridPane.margin></Label>
-                     </children>
-                  </GridPane>
-                  <VBox>
-                     <children>
-                        <RadioButton fx:id="correlatedQueryRadioButton" mnemonicParsing="false" text="Коррелированный подзапрос">
-                           <padding>
-                              <Insets bottom="5.0" left="10.0" />
-                           </padding>
-                        </RadioButton>
-                        <RadioButton fx:id="uncorrelatedQueryRadioButton" mnemonicParsing="false" text="Некоррелированный подзапрос">
-                           <padding>
-                              <Insets bottom="5.0" left="10.0" top="5.0" />
-                           </padding>
-                        </RadioButton>
-                     </children>
-                  </VBox>
-                  <Button fx:id="showResultButton2" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Выполнить подзапрос" />
-                  <AnchorPane fx:id="tableContainer3" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-         </content>
-      </Tab>
-      <Tab text="Запросы изменения данных">
-         <content>
-            <VBox>
-               <children>
-                  <HBox VBox.vgrow="ALWAYS">
-                     <children>
-                        <RadioButton fx:id="addProjectsDataRadioButton" mnemonicParsing="false" text="Добавить данные по проекту  ">
-                           <padding>
-                              <Insets left="5.0" top="5.0" />
-                           </padding>
-                        </RadioButton>
-                        <RadioButton fx:id="changeProjectsDataRadioButton" mnemonicParsing="false" text="Изменить данные по проекту  ">
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </RadioButton>
-                        <RadioButton fx:id="deleteProjectsDataRadioButton" mnemonicParsing="false" text="Удалить данные по проекту">
-                           <padding>
-                              <Insets top="5.0" />
-                           </padding>
-                        </RadioButton>
-                     </children>
-                  </HBox>
-                  <HBox VBox.vgrow="ALWAYS">
-                     <children>
-                        <GridPane HBox.hgrow="ALWAYS">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="NEVER" />
-                            <ColumnConstraints hgrow="SOMETIMES" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="ALWAYS" />
-                            <RowConstraints vgrow="ALWAYS" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="ALWAYS" />
-                            <RowConstraints vgrow="ALWAYS" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="ALWAYS" />
-                            <RowConstraints vgrow="ALWAYS" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="ALWAYS" />
-                              <RowConstraints vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints vgrow="ALWAYS" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints vgrow="SOMETIMES" />
-                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="ID проекта" GridPane.rowIndex="1" />
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Название" GridPane.rowIndex="3" />
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата начала" GridPane.rowIndex="5" />
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Дата конца" GridPane.rowIndex="7" />
-                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Статус" GridPane.rowIndex="9" />
-                              <CheckBox fx:id="completeProjectCheckBox" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Завершенный проект" GridPane.rowIndex="11" />
-                              <TextField fx:id="statusProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                              <TextField fx:id="endDateProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                              <TextField fx:id="startDateProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                              <TextField fx:id="nameProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                              <TextField fx:id="idProjectTextField3" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                           </children>
-                        </GridPane>
-                        <VBox HBox.hgrow="ALWAYS">
-                           <children>
-                              <Button fx:id="requestButton" mnemonicParsing="false" text="Выполнить запрос" />
-                              <Label text="Список компонентов">
-                                 <padding>
-                                    <Insets bottom="5.0" top="10.0" />
-                                 </padding>
-                              </Label>
-                              <ListView fx:id="projectsComponentsListVuew" VBox.vgrow="ALWAYS" />
-                           </children>
+<TabPane prefHeight="600.0" prefWidth="900.0" styleClass="main-tab-pane" tabClosingPolicy="UNAVAILABLE"
+         xmlns="http://javafx.com/javafx/17.0.12"
+         xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="com.monolatte.kontur.controllers.polygonPanelController">
+    <tabs>
+        <Tab text="Примеры запросов">
+            <content>
+                <VBox spacing="15.0" styleClass="content-panel">
+                    <children>
+                        <HBox spacing="20.0" styleClass="details-card">
+                            <children>
+                                <RadioButton fx:id="projectsRadioButton" text="Проекты" />
+                                <RadioButton fx:id="usersRadioButton" text="Пользователи" />
+                                <RadioButton fx:id="usersContactsRadioButton" text="Адреса пользователей" />
+                            </children>
+                            <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                        </HBox>
+                        <AnchorPane fx:id="tableContainer1" styleClass="details-card" VBox.vgrow="ALWAYS" />
+                    </children>
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                </VBox>
+            </content>
+        </Tab>
+
+        <Tab text="Полная запись Select">
+            <content>
+                <VBox spacing="15.0" styleClass="content-panel">
+                    <children>
+                        <VBox spacing="10.0" styleClass="details-card">
+                            <children>
+                                <Label styleClass="section-header" text="ПАРАМЕТРЫ ФИЛЬТРАЦИИ" />
+                                <GridPane hgap="15.0" vgap="10.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" />
+                                        <ColumnConstraints hgrow="NEVER" minWidth="120.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" />
+                                    </columnConstraints>
+                                    <children>
+                                        <Label text="ID проекта" />
+                                        <TextField fx:id="idProjectTextField1" GridPane.columnIndex="1" />
+
+                                        <CheckBox fx:id="projectsCostCheckBox" text="Стоимость проекта" GridPane.rowIndex="1" />
+                                        <TextField fx:id="projectsCostTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                        <CheckBox fx:id="sortedByCostCheckBox" text="Сорт. по убыванию" GridPane.rowIndex="2" />
+
+                                        <Label styleClass="section-header" text="ДЕТАЛИЗАЦИЯ" GridPane.columnIndex="2" />
+                                        <VBox spacing="8.0" GridPane.columnIndex="3" GridPane.rowSpan="3">
+                                            <children>
+                                                <RadioButton fx:id="costRadioButton" text="Стоимость по статусу" />
+                                                <RadioButton fx:id="showProjectsRadioButton" text="Вывод всех проектов" />
+                                                <RadioButton fx:id="withoutDetailsRadioButton" text="Без детализации" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </GridPane>
+                                <Button fx:id="showResult1" maxWidth="1.7976931348623157E308" styleClass="button-primary" text="Выполнить сложный запрос" />
+                            </children>
+                            <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
                         </VBox>
-                     </children>
-                  </HBox>
-                  <Button fx:id="showResultButton3" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Показать список проектов" />
-                  <AnchorPane fx:id="tableContainer4" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-               </children>
-            </VBox>
-         </content>
-      </Tab>
-  </tabs>
+                        <AnchorPane fx:id="tableContainer2" styleClass="details-card" VBox.vgrow="ALWAYS" />
+                    </children>
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                </VBox>
+            </content>
+        </Tab>
+
+        <Tab text="Пример подзапросов">
+            <content>
+                <VBox spacing="15.0" styleClass="content-panel">
+                    <children>
+                        <HBox spacing="15.0">
+                            <children>
+                                <VBox spacing="10.0" styleClass="details-card" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label styleClass="section-header" text="УСЛОВИЕ" />
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                            <children>
+                                                <Label text="ID проекта:" />
+                                                <TextField fx:id="idProjectTextField2" HBox.hgrow="ALWAYS" />
+                                            </children>
+                                        </HBox>
+                                        <Separator />
+                                        <RadioButton fx:id="correlatedQueryRadioButton" text="Коррелированный запрос" />
+                                        <RadioButton fx:id="uncorrelatedQueryRadioButton" text="Некоррелированный запрос" />
+                                        <Button fx:id="showResultButton2" maxWidth="1.7976931348623157E308" styleClass="button-primary" text="Запустить подзапрос" />
+                                    </children>
+                                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <AnchorPane fx:id="tableContainer3" styleClass="details-card" VBox.vgrow="ALWAYS" />
+                    </children>
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                </VBox>
+            </content>
+        </Tab>
+
+        <Tab text="Изменение данных">
+            <content>
+                <VBox spacing="15.0" styleClass="content-panel">
+                    <children>
+                        <HBox spacing="15.0" VBox.vgrow="SOMETIMES">
+                            <children>
+                                <VBox spacing="10.0" styleClass="details-card" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <HBox spacing="15.0">
+                                            <children>
+                                                <RadioButton fx:id="addProjectsDataRadioButton" text="Добавить" />
+                                                <RadioButton fx:id="changeProjectsDataRadioButton" text="Изменить" />
+                                                <RadioButton fx:id="deleteProjectsDataRadioButton" text="Удалить" />
+                                            </children>
+                                        </HBox>
+                                        <GridPane hgap="10.0" vgap="8.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="NEVER" minWidth="90.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" />
+                                            </columnConstraints>
+                                            <children>
+                                                <Label text="ID" />
+                                                <TextField fx:id="idProjectTextField3" GridPane.columnIndex="1" />
+                                                <Label text="Название" GridPane.rowIndex="1" />
+                                                <TextField fx:id="nameProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Начало" GridPane.rowIndex="2" />
+                                                <TextField fx:id="startDateProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Конец" GridPane.rowIndex="3" />
+                                                <TextField fx:id="endDateProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <Label text="Статус" GridPane.rowIndex="4" />
+                                                <TextField fx:id="statusProjectTextField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <CheckBox fx:id="completeProjectCheckBox" text="Завершен" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                            </children>
+                                        </GridPane>
+                                        <Button fx:id="requestButton" maxWidth="1.7976931348623157E308" styleClass="button-primary" text="ВЫПОЛНИТЬ ОПЕРАЦИЮ" />
+                                    </children>
+                                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                                </VBox>
+                                <VBox spacing="10.0" styleClass="details-card" prefWidth="250.0">
+                                    <children>
+                                        <Label styleClass="section-header" text="КОМПОНЕНТЫ" />
+                                        <ListView fx:id="projectsComponentsListVuew" VBox.vgrow="ALWAYS" />
+                                        <Button fx:id="showResultButton3" maxWidth="1.7976931348623157E308" text="Обновить список" />
+                                    </children>
+                                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <AnchorPane fx:id="tableContainer4" styleClass="details-card" VBox.vgrow="ALWAYS" />
+                    </children>
+                    <padding><Insets bottom="15.0" left="15.0" right="15.0" top="15.0" /></padding>
+                </VBox>
+            </content>
+        </Tab>
+    </tabs>
 </TabPane>

@@ -41,6 +41,8 @@ public class MainPanelController {
                     "/com/monolatte/kontur/ProjectsPanel.fxml"
             ));
             Parent subview = projectsLoader.load();
+            String cssPath = getClass().getResource("/com/monolatte/style/seregaStyle.css").toExternalForm();
+            subview.getStylesheets().add(cssPath);
             this.projectTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading project tab");
@@ -63,6 +65,8 @@ public class MainPanelController {
                     "/com/monolatte/kontur/UsersPanel.fxml"
             ));
             Parent subview = userLoader.load();
+            String cssPath = getClass().getResource("/com/monolatte/style/seregaStyle.css").toExternalForm();
+            subview.getStylesheets().add(cssPath);
             this.userTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading user tab");
@@ -85,6 +89,8 @@ public class MainPanelController {
                     "/com/monolatte/kontur/PolygonPanel.fxml"
             ));
             Parent subview = aboutpolygonLoader.load();
+            String cssPath = getClass().getResource("/com/monolatte/style/seregaStyle.css").toExternalForm();
+            subview.getStylesheets().add(cssPath);
             this.projectsPolygonTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading user tab");
