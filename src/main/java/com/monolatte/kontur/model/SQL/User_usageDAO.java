@@ -230,6 +230,21 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         }
     }
 
+    public List<String[]> getUsersAndProjectsJoin() {
+        List<String[]> data = new ArrayList<>();
+        // Аналог "Продажи": INNER JOIN Пользователей и Проектов
+        String sql = String.format(
+                "SELECT u.name, p.project_name FROM Users u " +
+                        "INNER JOIN %s uu ON u.id = uu.user_id " +
+                        "INNER JOIN Projects p ON uu.project_id = p.id", this._tableName);
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{rs.getString("name"), rs.getString("project_name")});
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+        return data;
+    }
+
     private User_usage mapResultSetToUser(ResultSet rs) throws SQLException {
         User_usage componentUsage = new User_usage(
                 rs.getLong("project_id"),

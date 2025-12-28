@@ -128,6 +128,44 @@ public class UserDAO implements ISQLDAOSearchable<User> {
         return notes;
     }
 
+    public List<String[]> getUsersSpecialSelection() {
+        List<String[]> data = new ArrayList<>();
+        // Аналог "Блюда": склеиваем имя и описание, добавляем статус
+        String sql = String.format("SELECT id, name || ' (' || description || ')' AS FullInfo, 'Активен' AS Status FROM %s", this._tableName);
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{rs.getString("id"), rs.getString("FullInfo"), rs.getString("Status")});
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+        return data;
+    }
+
+    // Добавьте это в UserDAO.java
+    public List<String[]> getUserAddressesSpecial() {
+        List<String[]> data = new ArrayList<>();
+        // SQL: Склеиваем имя и "адрес" (description), имитируем почтовый индекс или регион
+        // Аналог примера: Название + '-' + Тип
+        String sql = String.format(
+                "SELECT id, name AS FIO, " +
+                        "'г. Томск, ' || description AS Address, " +
+                        "'634000' AS ZipCode FROM %s", this._tableName);
+
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("id"),
+                        rs.getString("FIO"),
+                        rs.getString("Address"),
+                        rs.getString("ZipCode")
+                });
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User(
                 rs.getString("name"),

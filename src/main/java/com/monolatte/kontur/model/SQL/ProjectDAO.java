@@ -204,6 +204,57 @@ public class ProjectDAO implements ISQLDAOSearchable<Project> {
         return projects;
     }
 
+// Здесь мы склеиваем имя и статус, а также имитируем расчеты
+    public List<String[]> getProjectsSpecialSelection() {
+        List<String[]> data = new ArrayList<>();
+        // SQL: Склеиваем имя и статус через дефис, добавляем текстовое пояснение
+        // Используем ваши поля: project_name и status
+        String sql = String.format(
+                "SELECT id, project_name || ' [' || status || ']' AS Info, " +
+                        "start_date AS Start, 'В архиве' AS Note FROM %s", this._tableName);
+
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("id"),
+                        rs.getString("Info"),
+                        rs.getString("Start"),
+                        rs.getString("Note")
+                });
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
+// Соединяем проекты с компонентами через Component_Usage, чтобы увидеть,
+// какой проект какой компонент использует (в одном списке)
+    public List<String[]> getProjectsAndComponentsJoin() {
+        List<String[]> data = new ArrayList<>();
+        // SQL: Соединяем три таблицы: Проекты, Связи и Компоненты
+        String sql = String.format(
+                "SELECT p.id, p.project_name, c.name AS component_name " +
+                        "FROM %s p " +
+                        "INNER JOIN Component_Usage cu ON p.id = cu.project_id " +
+                        "INNER JOIN Components c ON cu.component_id = c.id", this._tableName);
+
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("id"),
+                        rs.getString("project_name"),
+                        rs.getString("component_name")
+                });
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return data;
+    }
+
     private Project mapResultSetToProject(ResultSet rs) throws SQLException {
         Project project = new Project(
         rs.getString("project_name"),

@@ -221,6 +221,32 @@ public class UserContactDAO implements ISQLDAOSearchable<UserContact> {
         }
     }
 
+    public List<String[]> getUserContactsSpecial() {
+        List<String[]> data = new ArrayList<>();
+
+        // Используем String.format, чтобы соответствовать вашему стилю в других методах
+        String sqlRequest = String.format(
+                "SELECT u.name, uc.contact_type || ': ' || uc.contact_value AS full_contact " +
+                        "FROM Users u " +
+                        "INNER JOIN %s uc ON u.id = uc.user_id",
+                this._tableName
+        );
+
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("name"),
+                        rs.getString("full_contact")
+                });
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка выполнения специального запроса контактов: " + e.getMessage(), e);
+        }
+        return data;
+    }
+
     private UserContact mapResultSetToUserContact(ResultSet rs) throws SQLException {
         UserContact userContact = new UserContact(
                 rs.getLong("user_id"),
