@@ -1,0 +1,138 @@
+/* Основной фон приложения */
+.root {
+    -fx-background-color: #f4f7f9;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Панели */
+.side-panel {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dce1e6;
+    -fx-border-width: 0 1 0 0;
+}
+
+.details-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+/* Заголовки разделов */
+.section-header {
+    -fx-text-fill: #5a67d8;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-padding: 0 0 5 0;
+}
+
+/* Кнопки */
+.button {
+    -fx-background-color: #edf2f7;
+    -fx-text-fill: #4a5568;
+    -fx-background-radius: 5;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.button-primary {
+    -fx-background-color: #5a67d8;
+    -fx-text-fill: white;
+}
+
+.button-primary:hover {
+    -fx-background-color: #4c51bf;
+}
+
+.button-danger {
+    -fx-background-color: #fed7d7;
+    -fx-text-fill: #c53030;
+}
+
+.button-danger:hover {
+    -fx-background-color: #feb2b2;
+}
+
+/* Поля ввода */
+.text-field, .choice-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 5;
+}
+
+.text-field:focused {
+    -fx-border-color: #5a67d8;
+    -fx-ring-color: transparent;
+}
+
+.read-only-field {
+    -fx-background-color: #f7fafc;
+    -fx-text-fill: #718096;
+}
+
+/* Списки */
+.list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 4;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 4;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #5a67d8;
+    -fx-text-fill: white;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #f0f4ff;
+    -fx-text-fill: #2d3748;
+}
+
+/* Разделители SplitPane */
+.split-pane {
+    -fx-background-color: transparent;
+}
+.split-pane *.split-pane-divider {
+    -fx-padding: 0 1 0 1;
+    -fx-background-color: #dce1e6;
+}
+/* Стили для вкладок */
+.tab-pane .tab-header-area {
+    -fx-padding: 0 0 0 10;
+}
+
+.tab-pane .tab-header-background {
+    -fx-background-color: #edf2f7;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 8 15;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #718096;
+    -fx-font-size: 13px;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #5a67d8;
+    -fx-font-weight: bold;
+}
+
+/* Линия под активной вкладкой */
+.tab-pane:top .tab-content-area {
+    -fx-background-color: #f4f7f9;
+    -fx-border-color: #dce1e6;
+    -fx-border-width: 1 0 0 0;
+}
