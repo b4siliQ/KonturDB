@@ -1,8 +1,6 @@
 package com.monolatte.kontur.model.SQL;
 
 import com.monolatte.kontur.model.Notes.Manufacturer;
-import com.monolatte.kontur.model.Notes.User;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,142 +14,99 @@ public class ManufacturerDAO implements ISQLDAOSearchable<Manufacturer> {
         this._connect = connection;
     }
 
+    // --- ТОТ САМЫЙ МЕТОД, КОТОРОГО НЕ ХВАТАЛО ---
+    public Manufacturer getNoteById(long id) {
+        String sql = String.format("SELECT * FROM %s WHERE id = ?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
+            pstmt.setLong(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Manufacturer m = new Manufacturer(rs.getString("name"), rs.getString("description"));
+                    m.setId(rs.getLong("id"));
+                    return m;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении производителя по ID: " + e.getMessage());
+        }
+        return null;
+    }
+
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "name TEXT NOT NULL, "
-                + "description TEXT NOT NULL)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " created or already exists");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+                + "description TEXT)", this._tableName);
+        try (Statement stmt = _connect.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
-    public void dropTable() {
-        String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+    public void addNote(Manufacturer m) {
+        String sql = String.format("INSERT INTO %s (name, description) VALUES (?,?)", this._tableName);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, m.getName());
+            pstmt.setString(2, m.getDescription());
             pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " dropped");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+            try (ResultSet keys = pstmt.getGeneratedKeys()) { if (keys.next()) m.setId(keys.getLong(1)); }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
-    public void addNote(Manufacturer manufacturer) {
-        String sqlRequest = String.format("INSERT INTO %s (name, description) VALUES (?,?)", this._tableName);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setString(1, manufacturer.getName());
-            pstmt.setString(2, manufacturer.getDescription());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try(ResultSet genKeys = pstmt.getGeneratedKeys()) {
-                    if (genKeys.next()) {
-                        long id = genKeys.getLong(1);
-                        manufacturer.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id\n",
-                                this._tableName,
-                                id
-                        );
-                    } else {
-                        System.err.println("Warning! Note has inserted, but without generated id\n");
-                    }
-                }
-            } else {
-                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    public void updateNote(Manufacturer m) {
+        String sql = String.format("UPDATE %s SET name=?, description=? WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql)) {
+            pstmt.setString(1, m.getName());
+            pstmt.setString(2, m.getDescription());
+            pstmt.setLong(3, m.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void deleteNote(long id) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE id = ?", this._tableName);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+        try (PreparedStatement pstmt = _connect.prepareStatement("DELETE FROM " + _tableName + " WHERE id=?")) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void updateNote(Manufacturer manufacturer) {
-        String sqlRequest = String.format("UPDATE %s SET name = ?, description = ? WHERE id = ?", this._tableName);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setString(1, manufacturer.getName());
-            pstmt.setString(2, manufacturer.getDescription());
-            pstmt.setLong(3, manufacturer.getId());
-
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public List<Manufacturer> getAllNotes() {
         List<Manufacturer> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s", this._tableName);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            ResultSet rs = pstmt.executeQuery();
+        try (Statement stmt = _connect.createStatement(); ResultSet rs = stmt.executeQuery("SELECT * FROM " + _tableName)) {
             while (rs.next()) {
-                Manufacturer note = mapResultSetToManufacturer(rs);
-                notes.add(note);
+                Manufacturer m = new Manufacturer(rs.getString("name"), rs.getString("description"));
+                m.setId(rs.getLong("id"));
+                notes.add(m);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        return notes;
-    }
-
-    public List<Manufacturer> getUsageByComponentId(long component_id) {
-        List<Manufacturer> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE component_id=?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, component_id);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                Manufacturer note = mapResultSetToManufacturer(rs);
-                notes.add(note);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
     @Override
-    public List<Manufacturer> search(String columnDescription, String searchTerm) {
+    public List<Manufacturer> search(String col, String term) {
         List<Manufacturer> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setString(1, "%" + searchTerm + "%");
-            try(ResultSet rs = pstmt.executeQuery()) {
+        String sql = String.format("SELECT * FROM %s WHERE %s LIKE ?", _tableName, col);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + term + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    notes.add(mapResultSetToManufacturer(rs));
+                    Manufacturer m = new Manufacturer(rs.getString("name"), rs.getString("description"));
+                    m.setId(rs.getLong("id"));
+                    notes.add(m);
                 }
             }
-        } catch (SQLException e) {
-            // Логирование и обработка ошибок базы данных
-            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
-    private Manufacturer mapResultSetToManufacturer(ResultSet rs) throws SQLException {
-        Manufacturer manufacturer = new Manufacturer(
-                //rs.getLong("project_id"),
-                rs.getString("name"),
-                rs.getString("description"));
-
-        manufacturer.setId(rs.getLong("id"));
-        return manufacturer;
+    @Override
+    public void dropTable() {
+        try (Statement stmt = _connect.createStatement()) {
+            stmt.executeUpdate("DROP TABLE IF EXISTS " + _tableName);
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 }

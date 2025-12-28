@@ -3,267 +3,144 @@ package com.monolatte.kontur.model.SQL;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
-
 import com.monolatte.kontur.model.Notes.Project;
 
 public class ProjectDAO implements ISQLDAOSearchable<Project> {
     final private String _tableName;
     final private Connection _connect;
 
-    ProjectDAO(String _tableName, Connection _connect) {
-        this._tableName = _tableName;
-        this._connect = _connect;
+    public ProjectDAO(String tableName, Connection connection) {
+        this._tableName = tableName;
+        this._connect = connection;
     }
 
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s(id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "project_name TEXT NOT NULL, start_date TEXT NOT NULL, end_date TEXT NOT NULL,"
                 + "status TEXT NOT NULL)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " created or already exists");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        try (Statement stmt = this._connect.createStatement()) { stmt.executeUpdate(sql); }
+        catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void dropTable() {
-        String sqlRequest = String.format("DROP TABLE IF EXISTS %s;", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " dropped");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        try (Statement stmt = this._connect.createStatement()) { stmt.executeUpdate("DROP TABLE IF EXISTS " + this._tableName); }
+        catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void addNote(Project project) {
-        String sqlRequest = String.format("INSERT INTO %s (project_name, start_date, end_date, status) VALUES (?, ?, ?, ?)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
+        String sql = String.format("INSERT INTO %s (project_name, start_date, end_date, status) VALUES (?,?,?,?)", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, project.getProject_name());
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet genKeys = pstmt.getGeneratedKeys()) {
-                    if (genKeys.next()) {
-                        long id = genKeys.getLong(1);
-                        project.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id\n",
-                                this._tableName,
-                                id
-                        );
-                    } else {
-                        System.err.println("Warning! Note has inserted, but without generated id\n");
-                    }
-                }
-            } else {
-                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+            pstmt.executeUpdate();
+            try (ResultSet rs = pstmt.getGeneratedKeys()) { if (rs.next()) project.setId(rs.getLong(1)); }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void deleteNote(long id) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE id = ?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+        try (PreparedStatement pstmt = this._connect.prepareStatement("DELETE FROM " + this._tableName + " WHERE id=?")) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void updateNote(Project project) {
-        String sqlReuqest = String.format("UPDATE %s SET project_name = ?, start_date = ?, end_date = ?, status = ? WHERE id = ?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlReuqest)) {
+        String sql = String.format("UPDATE %s SET project_name=?, start_date=?, end_date=?, status=? WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
             pstmt.setString(1, project.getProject_name());
             pstmt.setString(2, project.getStart_date());
             pstmt.setString(3, project.getEnd_date());
             pstmt.setString(4, project.getStatus());
             pstmt.setLong(5, project.getId());
             pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public List<Project> getAllNotes() {
-            List<Project> notes = new ArrayList<>();
-            String sqlRequest = String.format("SELECT * FROM %s ORDER BY id DESC", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                Project project = mapResultSetToProject(rs);
-                notes.add(project);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        List<Project> notes = new ArrayList<>();
+        try (Statement stmt = this._connect.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT * FROM " + this._tableName + " ORDER BY id DESC")) {
+            while (rs.next()) notes.add(mapResultSetToProject(rs));
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
     @Override
-    public List<Project> search(String columnDescription, String searchTerm) {
+    public List<Project> search(String column, String term) {
         List<Project> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setString(1, "%" + searchTerm + "%");
-            try(ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    notes.add(mapResultSetToProject(rs));
-                }
+        String sql = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, column);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + term + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) notes.add(mapResultSetToProject(rs));
             }
-        } catch (SQLException e) {
-            // Логирование и обработка ошибок базы данных
-            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
     public Project getNoteById(long id) {
-        String sql = String.format("SELECT * FROM %s WHERE id = ?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = this._connect.prepareStatement("SELECT * FROM " + this._tableName + " WHERE id=?")) {
             pstmt.setLong(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    Project project = new Project(
-                            rs.getString("project_name"),
-                            rs.getString("start_date"),
-                            rs.getString("end_date"),
-                            rs.getString("status")
-                    );
-                    project.setId(rs.getLong("id"));
-                    return project;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении проекта по ID: " + e.getMessage());
-        }
+            try (ResultSet rs = pstmt.executeQuery()) { if (rs.next()) return mapResultSetToProject(rs); }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return null;
     }
 
-    // 2. НЕКОРРЕЛИРОВАННЫЙ подзапрос (Проекты, чья стоимость выше средней)
+    // --- Вкладка 3: Некоррелированный подзапрос (Сложный расчет цен) ---
     public List<Project> getProjectsWithAboveAverageCost() {
         List<Project> projects = new ArrayList<>();
-        // Здесь мы соединяем Component_Usage с Components, чтобы получить цену (price)
-        String sql = String.format(
-                "SELECT * FROM %s WHERE id IN (" +
-                        "  SELECT cu.project_id FROM Component_Usage cu " +
-                        "  JOIN Components c ON cu.component_id = c.id " +
-                        "  GROUP BY cu.project_id " +
-                        "  HAVING SUM(c.price) > (" +
-                        "    SELECT AVG(total_cost) FROM (" +
-                        "      SELECT SUM(c2.price) as total_cost " +
-                        "      FROM Component_Usage cu2 " +
-                        "      JOIN Components c2 ON cu2.component_id = c2.id " +
-                        "      GROUP BY cu2.project_id" +
-                        "    )" +
-                        "  )" +
-                        ")", this._tableName);
-
-        try (Statement stmt = this._connect.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                projects.add(mapResultSetToProject(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка некоррелированного запроса: " + e.getMessage());
-        }
+        String sql = String.format("SELECT * FROM %s WHERE id IN (SELECT project_id FROM Component_Usage " +
+                "GROUP BY project_id HAVING SUM((SELECT price FROM Components WHERE id=component_id)) > " +
+                "(SELECT AVG(price) FROM Components))", this._tableName);
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) projects.add(mapResultSetToProject(rs));
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return projects;
     }
 
-    // 3. КОРРЕЛИРОВАННЫЙ подзапрос (Проекты, где есть хоть один компонент дороже 1000)
+    // --- Вкладка 3: Коррелированный подзапрос (EXISTS) ---
     public List<Project> getProjectsWithExpensiveComponents() {
         List<Project> projects = new ArrayList<>();
-        // Связываем внешний проект p с его компонентами через EXISTS
-        String sql = String.format(
-                "SELECT * FROM %s p WHERE EXISTS (" +
-                        "  SELECT 1 FROM Component_Usage cu " +
-                        "  JOIN Components c ON cu.component_id = c.id " +
-                        "  WHERE cu.project_id = p.id AND c.price > 1000" +
-                        ")", this._tableName);
-
-        try (Statement stmt = this._connect.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                projects.add(mapResultSetToProject(rs));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка коррелированного запроса: " + e.getMessage());
-        }
+        String sql = "SELECT * FROM " + this._tableName + " p WHERE EXISTS " +
+                "(SELECT 1 FROM Component_Usage cu JOIN Components c ON cu.component_id = c.id " +
+                "WHERE cu.project_id = p.id AND c.price > 1000)";
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) projects.add(mapResultSetToProject(rs));
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return projects;
     }
 
-// Здесь мы склеиваем имя и статус, а также имитируем расчеты
+    // --- Вкладка 1: Проекты (Обновлено: Логика CASE для статусов) ---
     public List<String[]> getProjectsSpecialSelection() {
         List<String[]> data = new ArrayList<>();
-        // SQL: Склеиваем имя и статус через дефис, добавляем текстовое пояснение
-        // Используем ваши поля: project_name и status
-        String sql = String.format(
-                "SELECT id, project_name || ' [' || status || ']' AS Info, " +
-                        "start_date AS Start, 'В архиве' AS Note FROM %s", this._tableName);
-
-        try (Statement stmt = this._connect.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        // Уникальный запрос: Склеиваем данные и вычисляем "Срочность" на лету
+        String sql = "SELECT id, (project_name || ' [' || status || ']') as title, " +
+                "start_date, " +
+                "CASE " +
+                " WHEN end_date < date('now') AND status != 'COMPLETED' THEN '⚠️ ПРОСРОЧЕНО' " +
+                " WHEN status = 'COMPLETED' THEN '✅ В архиве' " +
+                " ELSE '⚙️ В работе' " +
+                "END as urgency " +
+                "FROM " + this._tableName;
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                data.add(new String[]{
-                        rs.getString("id"),
-                        rs.getString("Info"),
-                        rs.getString("Start"),
-                        rs.getString("Note")
-                });
+                data.add(new String[]{rs.getString("id"), rs.getString("title"), rs.getString("start_date"), rs.getString("urgency")});
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return data;
-    }
-
-// Соединяем проекты с компонентами через Component_Usage, чтобы увидеть,
-// какой проект какой компонент использует (в одном списке)
-    public List<String[]> getProjectsAndComponentsJoin() {
-        List<String[]> data = new ArrayList<>();
-        // SQL: Соединяем три таблицы: Проекты, Связи и Компоненты
-        String sql = String.format(
-                "SELECT p.id, p.project_name, c.name AS component_name " +
-                        "FROM %s p " +
-                        "INNER JOIN Component_Usage cu ON p.id = cu.project_id " +
-                        "INNER JOIN Components c ON cu.component_id = c.id", this._tableName);
-
-        try (Statement stmt = this._connect.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                data.add(new String[]{
-                        rs.getString("id"),
-                        rs.getString("project_name"),
-                        rs.getString("component_name")
-                });
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return data;
     }
 
     private Project mapResultSetToProject(ResultSet rs) throws SQLException {
-        Project project = new Project(
-        rs.getString("project_name"),
-        rs.getString("start_date"),
-        rs.getString("end_date"),
-        rs.getString("status"));
-
-        project.setId(rs.getLong("id"));
-
-        return project;
+        Project p = new Project(rs.getString("project_name"), rs.getString("start_date"), rs.getString("end_date"), rs.getString("status"));
+        p.setId(rs.getLong("id"));
+        return p;
     }
 }

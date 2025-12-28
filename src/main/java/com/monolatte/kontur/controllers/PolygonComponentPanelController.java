@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class PolygonComponentPanelController {
 
-    // --- Вкладка 1: Примеры запросов ---
+    // --- Вкладка 1: Примеры запросов (Работаем по методичке) ---
     @FXML private RadioButton componentsRadioButton, manufaturersRadioButton, manufacturersAddressesRadioButton;
     @FXML private AnchorPane tableContainer1;
 
@@ -41,7 +41,6 @@ public class PolygonComponentPanelController {
     @FXML private Button showResultButton3;
     @FXML private AnchorPane tableContainer4;
 
-    // --- DAO Сервисы (Точные названия из вашего SQLTableManager) ---
     private final ComponentsDAO _componentDAO = SQLTableManager.getInstance().getComponentsManager();
     private final Components_usageDAO _usageDAO = SQLTableManager.getInstance().getComponentsUsageManager();
     private final ManufacturerAdressesDAO _addressDAO = SQLTableManager.getInstance().getManufacturerAddressDAO();
@@ -51,27 +50,72 @@ public class PolygonComponentPanelController {
     public void initialize() {
         _setupToggleGroups();
 
-        // 1. Простые выборки
+        // Реализация переключения вкладок согласно методичке
         componentsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "components"));
         manufaturersRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "manufacturers"));
         manufacturersAddressesRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "addresses"));
 
-        // 2. Сложный Select
         showResult1.setOnAction(_ -> _handleFullSelect());
-
-        // 3. Подзапросы (SQL логика в DAO)
         showResultButton2.setOnAction(_ -> _handleSubqueries());
-
-        // 4. Модификация (DML)
         _setupModificationLogic();
 
-        // Старт по умолчанию
         componentsRadioButton.setSelected(true);
         _loadDataToContainer(tableContainer1, "components");
     }
 
+    private void _loadDataToContainer(AnchorPane container, String type) {
+        if (container == null) return;
+        TableView<Object> table = new TableView<>();
+        ObservableList<Object> data = FXCollections.observableArrayList();
+
+        switch (type) {
+            case "components" -> {
+                // Аналог radioButtonWorkers: SELECT * (Простой вывод)
+                _setupComponentColumns(table);
+                _addComponentDetailColumns(table);
+                _componentDAO.getAllNotes().forEach(c -> data.add(new ComponentProperty(c)));
+            }
+            case "manufacturers" -> {
+                // Аналог radioButtonDishes: Вычисляемые поля и склейка строк
+                // Реализуем: Название + '-' + Описание, Константное поле, и Цена * 1.5 (если бы была цена)
+                TableColumn<Object, String> detailCol = new TableColumn<>("Подробнее (Имя-Описание)");
+                detailCol.setCellValueFactory(cd -> {
+                    Manufacturer m = (Manufacturer) cd.getValue();
+                    return new SimpleStringProperty(m.getName() + " - " + m.getDescription());
+                });
+
+                TableColumn<Object, String> statusCol = new TableColumn<>("Пояснение");
+                statusCol.setCellValueFactory(_ -> new SimpleStringProperty("Запись проверена"));
+
+                table.getColumns().addAll(detailCol, statusCol);
+                data.addAll(_manufacturerDAO.getAllNotes());
+            }
+            case "addresses" -> {
+                // Аналог radioButtonSales: INNER JOIN (Склеиваем адрес и имя производителя)
+                TableColumn<Object, String> cityCol = new TableColumn<>("Город");
+                cityCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getCity()));
+
+                TableColumn<Object, String> typeCol = new TableColumn<>("Тип связи");
+                typeCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getAddresses_type()));
+
+                TableColumn<Object, String> joinCol = new TableColumn<>("Производитель (JOIN)");
+                joinCol.setCellValueFactory(cd -> {
+                    long mId = ((ManufacturerAddresses)cd.getValue()).getManufacturer_id();
+                    Manufacturer m = _manufacturerDAO.getNoteById(mId);
+                    return new SimpleStringProperty(m != null ? m.getName() : "ID: " + mId);
+                });
+
+                table.getColumns().addAll(cityCol, typeCol, joinCol);
+                data.addAll(_addressDAO.getAllNotes());
+            }
+        }
+        table.setItems(data);
+        _injectTable(container, table);
+    }
+
+    // --- Остальная логика (DML, Subqueries, Select) ---
+
     private void _setupModificationLogic() {
-        // Автозаполнение при вводе ID
         idComponentTextField2.textProperty().addListener((_, _, newValue) -> {
             if (newValue != null && !newValue.isEmpty()) {
                 try {
@@ -81,13 +125,11 @@ public class PolygonComponentPanelController {
             } else _clearForm();
         });
 
-        // INSERT / UPDATE / DELETE
         requestButton.setOnAction(_ -> {
             _executeChange();
             _loadDataToContainer(tableContainer4, "components");
         });
 
-        // Кнопка "Показать список"
         showResultButton3.setOnAction(_ -> _loadDataToContainer(tableContainer4, "components"));
     }
 
@@ -111,6 +153,7 @@ public class PolygonComponentPanelController {
             } else if (deleteComponentsDataRadioButton.isSelected() && id != 0) {
                 _componentDAO.deleteNote(id);
             }
+            _clearForm();
         } catch (Exception e) { System.err.println("DML Error: " + e.getMessage()); }
     }
 
@@ -146,36 +189,6 @@ public class PolygonComponentPanelController {
         result.forEach(c -> data.add(new ComponentProperty(c)));
         table.setItems(data);
         _injectTable(tableContainer3, table);
-    }
-
-    private void _loadDataToContainer(AnchorPane container, String type) {
-        if (container == null) return;
-        TableView<Object> table = new TableView<>();
-        ObservableList<Object> data = FXCollections.observableArrayList();
-
-        switch (type) {
-            case "components" -> {
-                _setupComponentColumns(table);
-                _addComponentDetailColumns(table);
-                _componentDAO.getAllNotes().forEach(c -> data.add(new ComponentProperty(c)));
-            }
-            case "manufacturers" -> {
-                TableColumn<Object, String> col = new TableColumn<>("Наименование");
-                col.setCellValueFactory(cd -> new SimpleStringProperty(((Manufacturer)cd.getValue()).getName()));
-                table.getColumns().add(col);
-                data.addAll(_manufacturerDAO.getAllNotes());
-            }
-            case "addresses" -> {
-                TableColumn<Object, String> cityCol = new TableColumn<>("Город");
-                cityCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getCity()));
-                TableColumn<Object, String> typeCol = new TableColumn<>("Тип");
-                typeCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getAddresses_type()));
-                table.getColumns().addAll(cityCol, typeCol);
-                data.addAll(_addressDAO.getAllNotes());
-            }
-        }
-        table.setItems(data);
-        _injectTable(container, table);
     }
 
     private void _setupComponentColumns(TableView<Object> table) {

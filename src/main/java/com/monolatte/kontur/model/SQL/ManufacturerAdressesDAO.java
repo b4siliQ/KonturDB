@@ -1,8 +1,6 @@
 package com.monolatte.kontur.model.SQL;
 
 import com.monolatte.kontur.model.Notes.ManufacturerAddresses;
-import com.monolatte.kontur.model.Notes.Manufacturer;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,218 +14,103 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
         this._connect = connection;
     }
 
+    // Тот самый метод, который искал компилятор!
+    public ManufacturerAddresses getManufacturerAddressesByManufacturerId(long manufacturerId) {
+        String sql = String.format("SELECT * FROM %s WHERE manufacturer_id = ? LIMIT 1", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sql)) {
+            pstmt.setLong(1, manufacturerId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAddress(rs);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при поиске адреса: " + e.getMessage());
+        }
+        return null;
+    }
+
     @Override
     public void createTable() {
-        String sqlRequest = String.format("CREATE TABLE IF NOT EXISTS %s ("
-                        + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + "addresses_type TEXT NOT NULL, "
-                        + "city TEXT NOT NULL, "
-                        + "manufacturer_id INTEGER NOT NULL, "
-                        + "FOREIGN KEY(manufacturer_id) REFERENCES Manufacturers(id) ON DELETE CASCADE)",
-                this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " created or already exists");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s ("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + "addresses_type TEXT NOT NULL, "
+                + "city TEXT NOT NULL, "
+                + "manufacturer_id INTEGER NOT NULL, "
+                + "FOREIGN KEY(manufacturer_id) REFERENCES Manufacturers(id) ON DELETE CASCADE)", this._tableName);
+        try (Statement stmt = _connect.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
-    public void dropTable() {
-        String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+    public void addNote(ManufacturerAddresses addr) {
+        String sql = String.format("INSERT INTO %s (manufacturer_id, addresses_type, city) VALUES (?,?,?)", this._tableName);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setLong(1, addr.getManufacturer_id());
+            pstmt.setString(2, addr.getAddresses_type());
+            pstmt.setString(3, addr.getCity());
             pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " dropped");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+            try (ResultSet keys = pstmt.getGeneratedKeys()) { if (keys.next()) addr.setId(keys.getLong(1)); }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
-    public void addNote(ManufacturerAddresses manufacturerAddresses) {
-        String sqlRequest = String.format("INSERT INTO %s (manufacturer_id, contact_type, contact_value) VALUES (?,?,?)", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setLong(1, manufacturerAddresses.getManufacturer_id());
-            pstmt.setString(2, manufacturerAddresses.getAddresses_type());
-            pstmt.setString(3, manufacturerAddresses.getCity());
-
-            int affectedRows = pstmt.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet genKeys = pstmt.getGeneratedKeys()) {
-                    if (genKeys.next()) {
-                        long id = genKeys.getLong(1);
-                        manufacturerAddresses.setId(id);
-                        System.out.printf("Note has inserted in %s with %d%n id\n",
-                                this._tableName,
-                                id
-                        );
-                    } else {
-                        System.err.println("Warning! Note has inserted, but without generated id\n");
-                    }
-                }
-            } else {
-                System.err.printf("Alert! Note hasn't inserted in %s\n", this._tableName);
-            }
-            System.out.println("Table " + this._tableName + " added");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    public void updateNote(ManufacturerAddresses addr) {
+        String sql = String.format("UPDATE %s SET manufacturer_id=?, addresses_type=?, city=? WHERE id=?", this._tableName);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql)) {
+            pstmt.setLong(1, addr.getManufacturer_id());
+            pstmt.setString(2, addr.getAddresses_type());
+            pstmt.setString(3, addr.getCity());
+            pstmt.setLong(4, addr.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public void deleteNote(long id) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE id=?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+        try (PreparedStatement pstmt = _connect.prepareStatement("DELETE FROM " + _tableName + " WHERE id=?")) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
-            System.out.println("Table " + this._tableName + " deleted");
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    @Override
-    public void updateNote(ManufacturerAddresses manufacturerAddresses) {
-        String sqlRequest = String.format("UPDATE %s SET user_id=?, contact_type=?, contact_value=? WHERE id=?", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, manufacturerAddresses.getManufacturer_id());
-            pstmt.setString(2, manufacturerAddresses.getAddresses_type());
-            pstmt.setString(3, manufacturerAddresses.getCity());
-            pstmt.setLong(4, manufacturerAddresses.getId());
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
     @Override
     public List<ManufacturerAddresses> getAllNotes() {
         List<ManufacturerAddresses> notes = new ArrayList<>();
-        String sqlRequest = String.format("SELECT * FROM %s", this._tableName);
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                ManufacturerAddresses note = mapResultSetToUserContact(rs);
-                notes.add(note);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        try (Statement stmt = _connect.createStatement(); ResultSet rs = stmt.executeQuery("SELECT * FROM " + _tableName)) {
+            while (rs.next()) notes.add(mapResultSetToAddress(rs));
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
     @Override
-    public List<ManufacturerAddresses> search(String columnDescription, String searchTerm) {
+    public List<ManufacturerAddresses> search(String col, String term) {
         List<ManufacturerAddresses> notes = new ArrayList<>();
-
-        long idToSearch;
-        try {
-            idToSearch = Long.parseLong(searchTerm);
-        } catch (NumberFormatException e) {
-            System.err.println("Ошибка: Для поиска по ID введите число. Получено: " + searchTerm);
-            return notes;
-        }
-
-        String sqlRequest = String.format("SELECT * FROM %s WHERE %s LIKE ?", this._tableName, columnDescription);
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, idToSearch);
-            try(ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    notes.add(mapResultSetToUserContact(rs));
-                }
+        String sql = String.format("SELECT * FROM %s WHERE %s LIKE ?", _tableName, col);
+        try (PreparedStatement pstmt = _connect.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + term + "%");
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) notes.add(mapResultSetToAddress(rs));
             }
-        } catch (SQLException e) {
-            // Логирование и обработка ошибок базы данных
-            throw new RuntimeException("Ошибка выполнения поискового запроса: " + e.getMessage(), e);
-        }
+        } catch (SQLException e) { throw new RuntimeException(e); }
         return notes;
     }
 
-    public ManufacturerAddresses getManufacturerAddressesByManufacturerId(long manufacturerId) {
-        ManufacturerAddresses manufacturerAddress = null;
-
-        // SQL запрос для связи 1:1
-        String sqlRequest = String.format(
-                "SELECT m.* FROM Manufacturer_Addresses m " +
-                        "INNER JOIN %s mu ON m.id = mu.id " +
-                        "WHERE mu.manufacturer_id = ? LIMIT 1",
-                this._tableName
-        );
-
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, manufacturerId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                // Используем if, так как ожидаем только одну запись
-                if (rs.next()) {
-                    manufacturerAddress = new ManufacturerAddresses(
-                            rs.getLong("manufacturer_id"),
-                            rs.getString("addresses_type"),
-                            rs.getString("city")
-                    );
-                    // Устанавливаем ID из базы данных
-                    manufacturerAddress.setId(rs.getLong("id"));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении адреса производителя ID " + manufacturerId + ": " + e.getMessage(), e);
-        }
-
-        return manufacturerAddress;
+    @Override
+    public void dropTable() {
+        try (Statement stmt = _connect.createStatement()) {
+            stmt.executeUpdate("DROP TABLE IF EXISTS " + _tableName);
+        } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
-
-    public List<Manufacturer> getManufacturerByManufacturerAddressesId(long addressesId) {
-        List<Manufacturer> manufacturers = new ArrayList<>();
-        String sqlRequest = String.format(
-                "SELECT m.* FROM Manufacturers m " +
-                        "INNER JOIN %s mu ON m.id = mu.manufacturer_id " +
-                        "WHERE mu.id = ?",
-                this._tableName
-        );
-
-        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, addressesId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    Manufacturer manufacturer = new Manufacturer(
-                            rs.getString("name"),
-                            rs.getString("description"));
-
-                    manufacturer.setId(rs.getLong("id"));
-                    manufacturers.add(manufacturer);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении пользователей для проекта: " + e.getMessage(), e);
-        }
-
-        return manufacturers;
-    }
-
-    public void removeAddressesByManufacturerId(long userId) {
-        String sqlRequest = String.format("DELETE FROM %s WHERE user_id = ?",
-                this._tableName
-        );
-        try(PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
-            pstmt.setLong(1, userId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private ManufacturerAddresses mapResultSetToUserContact(ResultSet rs) throws SQLException {
-        ManufacturerAddresses manufacturerAddresses = new ManufacturerAddresses(
+    private ManufacturerAddresses mapResultSetToAddress(ResultSet rs) throws SQLException {
+        ManufacturerAddresses addr = new ManufacturerAddresses(
                 rs.getLong("manufacturer_id"),
                 rs.getString("addresses_type"),
                 rs.getString("city")
         );
-
-        manufacturerAddresses.setId(rs.getLong("id"));
-
-        return manufacturerAddresses;
+        addr.setId(rs.getLong("id"));
+        return addr;
     }
 }
