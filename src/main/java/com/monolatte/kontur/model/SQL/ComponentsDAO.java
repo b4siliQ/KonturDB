@@ -124,6 +124,25 @@ public class ComponentsDAO implements ISQLDAOSearchable<Component> {
         return notes;
     }
 
+    // Специальная выборка для вкладки 1 (Аналог "Блюда")
+    public List<String[]> getComponentsSpecialSelection() {
+        List<String[]> data = new ArrayList<>();
+        // SQL: Склеиваем имя и тип, считаем цену с наценкой 15%
+        String sql = "SELECT id, (name || ' [' || type || ']') as info, " +
+                "price, (price * 1.15) as price_with_tax, " +
+                "CASE WHEN quantity > 0 THEN 'В наличии' ELSE 'Нет' END as status " +
+                "FROM " + this._tableName;
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("id"), rs.getString("info"),
+                        rs.getString("price"), rs.getString("price_with_tax"), rs.getString("status")
+                });
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+        return data;
+    }
+
     private Component mapResultSetToComponent(ResultSet rs) throws SQLException {
         Component c = new Component(rs.getString("name"), rs.getString("type"), rs.getString("specification"),
                 rs.getString("datasheet_link"), rs.getFloat("price"), rs.getInt("quantity"));

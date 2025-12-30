@@ -104,6 +104,20 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
         } catch (SQLException e) { throw new RuntimeException(e); }
     }
 
+    public List<String[]> getAddressesWithJoinSelection() {
+        List<String[]> data = new ArrayList<>();
+        // SQL: JOIN адресов и производителей
+        String sql = "SELECT a.city, a.addresses_type, m.name as manufacturer_name " +
+                "FROM " + this._tableName + " a " +
+                "INNER JOIN Manufacturers m ON a.manufacturer_id = m.id";
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{rs.getString("city"), rs.getString("addresses_type"), rs.getString("manufacturer_name")});
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+        return data;
+    }
+
     private ManufacturerAddresses mapResultSetToAddress(ResultSet rs) throws SQLException {
         ManufacturerAddresses addr = new ManufacturerAddresses(
                 rs.getLong("manufacturer_id"),

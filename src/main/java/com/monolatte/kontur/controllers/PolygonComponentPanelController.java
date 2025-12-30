@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class PolygonComponentPanelController {
 
-    // --- Вкладка 1: Примеры запросов (Работаем по методичке) ---
+    // --- Вкладка 1: Примеры запросов ---
     @FXML private RadioButton componentsRadioButton, manufaturersRadioButton, manufacturersAddressesRadioButton;
     @FXML private AnchorPane tableContainer1;
 
@@ -26,7 +26,6 @@ public class PolygonComponentPanelController {
     @FXML private AnchorPane tableContainer2;
 
     // --- Вкладка 3: Пример подзапросов ---
-    @FXML private TextField idComponentTextField;
     @FXML private RadioButton correlatedQueryRadioButton, uncorrelatedQueryRadioButton;
     @FXML private Button showResultButton2;
     @FXML private AnchorPane tableContainer3;
@@ -37,8 +36,7 @@ public class PolygonComponentPanelController {
     @FXML private TextArea specificationComponentTextField;
     @FXML private CheckBox completeComponentCheckBox;
     @FXML private ListView<Project> componentsProjectsListVuew;
-    @FXML private Button requestButton;
-    @FXML private Button showResultButton3;
+    @FXML private Button requestButton, showResultButton3;
     @FXML private AnchorPane tableContainer4;
 
     private final ComponentsDAO _componentDAO = SQLTableManager.getInstance().getComponentsManager();
@@ -50,136 +48,97 @@ public class PolygonComponentPanelController {
     public void initialize() {
         _setupToggleGroups();
 
-        // Реализация переключения вкладок согласно методичке
-        componentsRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "components"));
-        manufaturersRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "manufacturers"));
-        manufacturersAddressesRadioButton.setOnAction(_ -> _loadDataToContainer(tableContainer1, "addresses"));
+        // ЛОГИКА ВКЛАДКИ 1: Переключение между простым и сложными запросами
+        componentsRadioButton.setOnAction(_ -> _loadSpecialDataToContainer(tableContainer1, "comp_simple"));
+        manufaturersRadioButton.setOnAction(_ -> _loadSpecialDataToContainer(tableContainer1, "manuf_complex"));
+        manufacturersAddressesRadioButton.setOnAction(_ -> _loadSpecialDataToContainer(tableContainer1, "addr_join"));
 
+        // Остальные вкладки
         showResult1.setOnAction(_ -> _handleFullSelect());
         showResultButton2.setOnAction(_ -> _handleSubqueries());
+        showResultButton3.setOnAction(_ -> _loadSpecialDataToContainer(tableContainer4, "comp_simple"));
         _setupModificationLogic();
 
+        // Начальное состояние
         componentsRadioButton.setSelected(true);
-        _loadDataToContainer(tableContainer1, "components");
+        _loadSpecialDataToContainer(tableContainer1, "comp_simple");
     }
 
-    private void _loadDataToContainer(AnchorPane container, String type) {
+    // --- ЦЕНТРАЛЬНЫЙ МЕТОД ДЛЯ ВКЛАДКИ 1 (Использование String[]) ---
+    private void _loadSpecialDataToContainer(AnchorPane container, String type) {
         if (container == null) return;
-        TableView<Object> table = new TableView<>();
-        ObservableList<Object> data = FXCollections.observableArrayList();
+
+        TableView<String[]> table = new TableView<>();
+        List<String[]> data = new ArrayList<>();
+        String[] headers = new String[]{};
 
         switch (type) {
-            case "components" -> {
-                // Аналог radioButtonWorkers: SELECT * (Простой вывод)
-                _setupComponentColumns(table);
-                _addComponentDetailColumns(table);
-                _componentDAO.getAllNotes().forEach(c -> data.add(new ComponentProperty(c)));
+            case "comp_simple" -> {
+                // Радиобаттон 1: ПРОСТОЙ ВЫВОД (SELECT *)
+                headers = new String[]{"ID", "Название", "Тип", "Цена", "Кол-во"};
+                List<Component> raw = _componentDAO.getAllNotes();
+                for (Component c : raw) {
+                    data.add(new String[]{
+                            String.valueOf(c.getId()), c.getName(), c.getType(),
+                            String.valueOf(c.getPrice()), String.valueOf(c.getQuantity())
+                    });
+                }
             }
-            case "manufacturers" -> {
-                // Аналог radioButtonDishes: Вычисляемые поля и склейка строк
-                // Реализуем: Название + '-' + Описание, Константное поле, и Цена * 1.5 (если бы была цена)
-                TableColumn<Object, String> detailCol = new TableColumn<>("Подробнее (Имя-Описание)");
-                detailCol.setCellValueFactory(cd -> {
-                    Manufacturer m = (Manufacturer) cd.getValue();
-                    return new SimpleStringProperty(m.getName() + " - " + m.getDescription());
-                });
-
-                TableColumn<Object, String> statusCol = new TableColumn<>("Пояснение");
-                statusCol.setCellValueFactory(_ -> new SimpleStringProperty("Запись проверена"));
-
-                table.getColumns().addAll(detailCol, statusCol);
-                data.addAll(_manufacturerDAO.getAllNotes());
+            case "manuf_complex" -> {
+                // Радиобаттон 2: СЛОЖНЫЙ ЗАПРОС (CASE + Склейка строк в SQL)
+                headers = new String[]{"ID", "Производитель (Инфо)", "Статус"};
+                data = _manufacturerDAO.getManufacturersSpecialSelection();
             }
-            case "addresses" -> {
-                // Аналог radioButtonSales: INNER JOIN (Склеиваем адрес и имя производителя)
-                TableColumn<Object, String> cityCol = new TableColumn<>("Город");
-                cityCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getCity()));
-
-                TableColumn<Object, String> typeCol = new TableColumn<>("Тип связи");
-                typeCol.setCellValueFactory(cd -> new SimpleStringProperty(((ManufacturerAddresses)cd.getValue()).getAddresses_type()));
-
-                TableColumn<Object, String> joinCol = new TableColumn<>("Производитель (JOIN)");
-                joinCol.setCellValueFactory(cd -> {
-                    long mId = ((ManufacturerAddresses)cd.getValue()).getManufacturer_id();
-                    Manufacturer m = _manufacturerDAO.getNoteById(mId);
-                    return new SimpleStringProperty(m != null ? m.getName() : "ID: " + mId);
-                });
-
-                table.getColumns().addAll(cityCol, typeCol, joinCol);
-                data.addAll(_addressDAO.getAllNotes());
+            case "addr_join" -> {
+                // Радиобаттон 3: JOIN ЗАПРОС (Связь адресов и имен производителей)
+                headers = new String[]{"Город", "Тип контакта", "Имя производителя (из JOIN)"};
+                data = _addressDAO.getAddressesWithJoinSelection();
             }
         }
-        table.setItems(data);
+
+        // Динамическое создание колонок для массива String[]
+        table.getColumns().clear();
+        for (int i = 0; i < headers.length; i++) {
+            final int index = i;
+            TableColumn<String[], String> column = new TableColumn<>(headers[i]);
+            column.setCellValueFactory(cellData -> {
+                String[] row = cellData.getValue();
+                return new SimpleStringProperty((row != null && index < row.length) ? row[index] : "");
+            });
+            table.getColumns().add(column);
+        }
+
+        table.setItems(FXCollections.observableArrayList(data));
         _injectTable(container, table);
     }
 
-    // --- Остальная логика (DML, Subqueries, Select) ---
-
-    private void _setupModificationLogic() {
-        idComponentTextField2.textProperty().addListener((_, _, newValue) -> {
-            if (newValue != null && !newValue.isEmpty()) {
-                try {
-                    Component c = _componentDAO.getNoteById(Long.parseLong(newValue));
-                    if (c != null) _fillForm(c); else _clearForm();
-                } catch (Exception e) { _clearForm(); }
-            } else _clearForm();
-        });
-
-        requestButton.setOnAction(_ -> {
-            _executeChange();
-            _loadDataToContainer(tableContainer4, "components");
-        });
-
-        showResultButton3.setOnAction(_ -> _loadDataToContainer(tableContainer4, "components"));
-    }
-
-    private void _executeChange() {
-        try {
-            String name = nameComponentTextField.getText();
-            String spec = specificationComponentTextField.getText();
-            String link = datasheetLinkComponentTextFielf.getText();
-            float price = Float.parseFloat(costComponentTextFeild.getText().isEmpty() ? "0" : costComponentTextFeild.getText());
-            int qty = Integer.parseInt(quantityComponentTextFeild.getText().isEmpty() ? "0" : quantityComponentTextFeild.getText());
-            if (completeComponentCheckBox.isSelected()) qty = 0;
-
-            Component component = new Component(name, "Electronic", spec, link, price, qty);
-            long id = idComponentTextField2.getText().isEmpty() ? 0 : Long.parseLong(idComponentTextField2.getText());
-
-            if (addСomponentsDataRadioButton.isSelected()) {
-                _componentDAO.addNote(component);
-            } else if (changeComponentsDataRadioButton.isSelected() && id != 0) {
-                component.setId(id);
-                _componentDAO.updateNote(component);
-            } else if (deleteComponentsDataRadioButton.isSelected() && id != 0) {
-                _componentDAO.deleteNote(id);
-            }
-            _clearForm();
-        } catch (Exception e) { System.err.println("DML Error: " + e.getMessage()); }
-    }
-
+    // --- ЛОГИКА ВКЛАДКИ 2 (Select с фильтрами) ---
     private void _handleFullSelect() {
         TableView<Object> table = new TableView<>();
         _setupComponentColumns(table);
         if (!withoutDetailsRadioButton.isSelected()) _addComponentDetailColumns(table);
 
         List<ComponentProperty> props = new ArrayList<>();
-        _componentDAO.getAllNotes().forEach(c -> props.add(new ComponentProperty(c)));
+        List<Component> raw = (idComponentTextField1.getText().isEmpty())
+                ? _componentDAO.getAllNotes()
+                : _componentDAO.search("id", idComponentTextField1.getText());
 
+        raw.forEach(c -> props.add(new ComponentProperty(c)));
+
+        // Фильтрация по цене на лету (если введено значение)
         if (!componentCostTextField.getText().isEmpty()) {
-            float min = Float.parseFloat(componentCostTextField.getText());
-            props.removeIf(p -> p.priceProperty().get() < min);
+            float minPrice = Float.parseFloat(componentCostTextField.getText());
+            props.removeIf(p -> p.priceProperty().get() < minPrice);
         }
-        if (sortedByCostCheckBox.isSelected()) {
-            props.sort((a, b) -> Float.compare(b.priceProperty().get(), a.priceProperty().get()));
-        }
+
         table.setItems(FXCollections.observableArrayList(props));
         _injectTable(tableContainer2, table);
     }
 
+    // --- ЛОГИКА ВКЛАДКИ 3 (Подзапросы) ---
     private void _handleSubqueries() {
         TableView<Object> table = new TableView<>();
         _setupComponentColumns(table);
-        _addComponentDetailColumns(table);
 
         List<Component> result = uncorrelatedQueryRadioButton.isSelected()
                 ? _componentDAO.getComponentsAboveAveragePrice()
@@ -191,10 +150,48 @@ public class PolygonComponentPanelController {
         _injectTable(tableContainer3, table);
     }
 
+    // --- ЛОГИКА ВКЛАДКИ 4 (DML) ---
+    private void _setupModificationLogic() {
+        idComponentTextField2.textProperty().addListener((_, _, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                try {
+                    Component c = _componentDAO.getNoteById(Long.parseLong(newValue));
+                    if (c != null) _fillForm(c); else _clearForm();
+                } catch (Exception e) { _clearForm(); }
+            } else _clearForm();
+        });
+
+        requestButton.setOnAction(_ -> {
+            _executeDML();
+            _loadSpecialDataToContainer(tableContainer4, "comp_simple");
+        });
+    }
+
+    private void _executeDML() {
+        try {
+            String name = nameComponentTextField.getText();
+            float price = Float.parseFloat(costComponentTextFeild.getText());
+            int qty = Integer.parseInt(quantityComponentTextFeild.getText());
+
+            Component c = new Component(name, "Electronic", specificationComponentTextField.getText(),
+                    datasheetLinkComponentTextFielf.getText(), price, qty);
+
+            long id = idComponentTextField2.getText().isEmpty() ? 0 : Long.parseLong(idComponentTextField2.getText());
+
+            if (addСomponentsDataRadioButton.isSelected()) _componentDAO.addNote(c);
+            else if (changeComponentsDataRadioButton.isSelected() && id != 0) { c.setId(id); _componentDAO.updateNote(c); }
+            else if (deleteComponentsDataRadioButton.isSelected() && id != 0) _componentDAO.deleteNote(id);
+
+            _clearForm();
+        } catch (Exception e) { System.err.println("Ошибка DML"); }
+    }
+
+    // --- ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ---
+
     private void _setupComponentColumns(TableView<Object> table) {
         TableColumn<Object, Long> idCol = new TableColumn<>("ID");
         idCol.setCellValueFactory(cd -> ((ComponentProperty)cd.getValue()).idProperty().asObject());
-        TableColumn<Object, String> nameCol = new TableColumn<>("Название");
+        TableColumn<Object, String> nameCol = new TableColumn<>("Наименование");
         nameCol.setCellValueFactory(cd -> ((ComponentProperty)cd.getValue()).nameProperty());
         table.getColumns().setAll(idCol, nameCol);
     }
@@ -202,29 +199,25 @@ public class PolygonComponentPanelController {
     private void _addComponentDetailColumns(TableView<Object> table) {
         TableColumn<Object, Number> pCol = new TableColumn<>("Цена");
         pCol.setCellValueFactory(cd -> ((ComponentProperty)cd.getValue()).priceProperty());
-        TableColumn<Object, Number> qCol = new TableColumn<>("Кол-во");
-        qCol.setCellValueFactory(cd -> ((ComponentProperty)cd.getValue()).quantityProperty());
-        table.getColumns().addAll(pCol, qCol);
+        table.getColumns().add(pCol);
     }
 
     private void _fillForm(Component c) {
         nameComponentTextField.setText(c.getName());
-        specificationComponentTextField.setText(c.getSpecification());
-        datasheetLinkComponentTextFielf.setText(c.getDatasheet_link());
         costComponentTextFeild.setText(String.valueOf(c.getPrice()));
         quantityComponentTextFeild.setText(String.valueOf(c.getQuantity()));
-        completeComponentCheckBox.setSelected(c.getQuantity() <= 0);
+        specificationComponentTextField.setText(c.getSpecification());
+        datasheetLinkComponentTextFielf.setText(c.getDatasheet_link());
         componentsProjectsListVuew.setItems(FXCollections.observableArrayList(_usageDAO.getProjectsByComponentId(c.getId())));
     }
 
     private void _clearForm() {
-        nameComponentTextField.clear(); specificationComponentTextField.clear();
-        datasheetLinkComponentTextFielf.clear(); costComponentTextFeild.clear();
-        quantityComponentTextFeild.clear(); completeComponentCheckBox.setSelected(false);
-        componentsProjectsListVuew.getItems().clear();
+        nameComponentTextField.clear(); costComponentTextFeild.clear();
+        quantityComponentTextFeild.clear(); specificationComponentTextField.clear();
+        datasheetLinkComponentTextFielf.clear(); componentsProjectsListVuew.getItems().clear();
     }
 
-    private void _injectTable(AnchorPane container, TableView<Object> table) {
+    private void _injectTable(AnchorPane container, TableView<?> table) {
         container.getChildren().setAll(table);
         AnchorPane.setTopAnchor(table, 0.0); AnchorPane.setBottomAnchor(table, 0.0);
         AnchorPane.setLeftAnchor(table, 0.0); AnchorPane.setRightAnchor(table, 0.0);

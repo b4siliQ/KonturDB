@@ -103,6 +103,31 @@ public class ManufacturerDAO implements ISQLDAOSearchable<Manufacturer> {
         return notes;
     }
 
+    public List<String[]> getManufacturersSpecialSelection() {
+        List<String[]> data = new ArrayList<>();
+        // Только реальные данные и стандартные SQL функции:
+        // UPPER(name) - название капсом
+        // (name || ' : ' || description) - склейка строк
+        // LENGTH(description) - реальная длина текста описания
+        String sql = "SELECT id, " +
+                "UPPER(name) as loud_name, " +
+                "(name || ' — ' || description) as full_info, " +
+                "LENGTH(description) as desc_length " +
+                "FROM " + this._tableName;
+
+        try (Statement stmt = this._connect.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                data.add(new String[]{
+                        rs.getString("id"),
+                        rs.getString("loud_name"),
+                        rs.getString("full_info"),
+                        rs.getString("desc_length") + " симв." // Добавляем пояснение к числу
+                });
+            }
+        } catch (SQLException e) { throw new RuntimeException(e); }
+        return data;
+    }
+
     @Override
     public void dropTable() {
         try (Statement stmt = _connect.createStatement()) {
