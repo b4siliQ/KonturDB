@@ -98,6 +98,7 @@ public class ProjectsPanelController {
             ));
             Parent root = popupLoader.load();
 
+
             Stage popupStage = new Stage();
             Scene popupScene = new Scene(root);
 

@@ -140,7 +140,6 @@ public class UserDAO implements ISQLDAOSearchable<User> {
         return data;
     }
 
-    // Добавьте это в UserDAO.java
     public List<String[]> getUserAddressesSpecial() {
         List<String[]> data = new ArrayList<>();
         // SQL: Склеиваем имя и "адрес" (description), имитируем почтовый индекс или регион

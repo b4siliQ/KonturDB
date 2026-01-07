@@ -136,3 +136,36 @@
     -fx-border-color: #dce1e6;
     -fx-border-width: 1 0 0 0;
 }
+
+/* Красивая таблица */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 4;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f7fafc;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #4a5568;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #fcfcfc;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #ebf4ff;
+}
+
+.table-row-cell:selected .text {
+    -fx-fill: #5a67d8;
+}

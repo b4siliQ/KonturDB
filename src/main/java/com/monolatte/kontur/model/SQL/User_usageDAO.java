@@ -158,7 +158,6 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
     // --- Твой специальный JOIN (Обновлено: Группировка + Подсчет) ---
     public List<String[]> getUsersAndProjectsJoin() {
         List<String[]> data = new ArrayList<>();
-        // Показываем юзера и сколько у него уникальных проектов (Агрегация)
         String sql = "SELECT u.name, 'Проектов: ' || COUNT(uu.project_id) as count_info " +
                 "FROM Users u " +
                 "LEFT JOIN " + this._tableName + " uu ON u.id = uu.user_id " +
