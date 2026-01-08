@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.Notes.Component_usage;
 import com.monolatte.kontur.model.Notes.Project;
+import com.monolatte.kontur.model.Notifyers.ErrorNotifyer;
 
 public class Components_usageDAO implements ISQLDAO<Component_usage> {
     final private String _tableName;
