@@ -4,7 +4,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.MainPanelController">
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monolatte.kontur.controllers.MainPanelController">
   <tabs>
     <Tab fx:id="componentTab" text="Компоненты">
       <content>
@@ -22,6 +22,11 @@
         </content>
       </Tab>
       <Tab fx:id="userTab" text="Пользователь">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        </content>
+      </Tab>
+      <Tab fx:id="manufacturerAddressTab" text="Адрес производителя">
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
         </content>

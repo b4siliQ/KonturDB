@@ -24,6 +24,8 @@ public class MainPanelController {
     Tab componentsPolygonTab;
     @FXML
     Tab userContactsTab;
+    @FXML
+    Tab manufacturerAddressTab;
 
     @FXML
     public void initialize() {
@@ -120,6 +122,17 @@ public class MainPanelController {
             this.userContactsTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading user tab");
+            throw new RuntimeException(e);
+        }
+
+        try {
+            var manufacturerAddressLoader = new FXMLLoader(MainPanelController.class.getResource(
+                    "/com/monolatte/kontur/ManufacturerAddressPanel.fxml"
+            ));
+            Parent subview = manufacturerAddressLoader.load();
+            this.manufacturerAddressTab.setContent(subview);
+        } catch (IOException e) {
+            System.err.println("Alert! An error has occurred while loading manufacturer\'s address tab");
             throw new RuntimeException(e);
         }
     }
