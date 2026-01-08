@@ -14,7 +14,7 @@ public class Manufacturer_usageDAO implements ISQLDAOSearchable<Manufacturer_Usa
         this._connect = connection;
     }
 
-    // --- ТОТ САМЫЙ МЕТОД ДЛЯ ManufacturersPanelController ---
+
     public void removeComponentByManufacturerId(long componentId, long manufacturerId) {
         String sqlRequest = String.format("DELETE FROM %s WHERE component_id = ? AND manufacturer_id = ?",
                 this._tableName
