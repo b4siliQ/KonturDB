@@ -2,12 +2,12 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
 import com.monolatte.kontur.model.Notes.Enums.ComponentsType;
-import com.monolatte.kontur.model.Notes.Enums.ProjectStatus;
 import com.monolatte.kontur.model.Notes.Manufacturer;
 import com.monolatte.kontur.model.SQL.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
 import com.monolatte.kontur.model.SQL.Manufacturer_usageDAO;
 import com.monolatte.kontur.model.SQL.SQLTableManager;
+import com.monolatte.kontur.model.Notifyers.ErrorNotifyer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,46 +26,26 @@ import java.io.File;
 import java.io.IOException;
 
 public class ComponentsPanelController {
-    @FXML
-    ListView<Component> compList;
-    @FXML
-    ListView<Manufacturer> manufacturerListView;
-    @FXML
-    Button addEmptyButton;
-    @FXML
-    Button removeButton;
-    @FXML
-    Button openInTableButton;
-    @FXML
-    Button searchButton;
-    @FXML
-    Button resetSearchButton;
-    @FXML
-    Button openManufacturerButton;
-    @FXML
-    ChoiceBox<ComponentColumns> columnSorterChoiceBox;
-    @FXML
-    TextField searchTextField;
-    @FXML
-    TextField idTextField;
-    @FXML
-    TextField nameCompTextField;
-    @FXML
-    ChoiceBox<ComponentsType> typeChoiceBox;
-    @FXML
-    TextField costTextField;
-    @FXML
-    TextField quantityTextField;
-    @FXML
-    TextArea compInfoTextArea;
-    @FXML
-    TextField datasheetPathTextField;
-    @FXML
-    Button openDatasheetButton;
-    @FXML
-    Button addCompButton;
-    @FXML
-    Button saveDataButton;
+    @FXML ListView<Component> compList;
+    @FXML ListView<Manufacturer> manufacturerListView;
+    @FXML Button addEmptyButton;
+    @FXML Button removeButton;
+    @FXML Button openInTableButton;
+    @FXML Button searchButton;
+    @FXML Button resetSearchButton;
+    @FXML Button openManufacturerButton;
+    @FXML ChoiceBox<ComponentColumns> columnSorterChoiceBox;
+    @FXML TextField searchTextField;
+    @FXML TextField idTextField;
+    @FXML TextField nameCompTextField;
+    @FXML ChoiceBox<ComponentsType> typeChoiceBox;
+    @FXML TextField costTextField;
+    @FXML TextField quantityTextField;
+    @FXML TextArea compInfoTextArea;
+    @FXML TextField datasheetPathTextField;
+    @FXML Button openDatasheetButton;
+    @FXML Button addCompButton;
+    @FXML Button saveDataButton;
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
     private final Manufacturer_usageDAO _manufacturerUsageDAO = SQLTableManager.getInstance().getManufacturerUsageDAO();
@@ -79,68 +59,61 @@ public class ComponentsPanelController {
 
     @FXML
     public void _onAddEmptyButtonClicked() {
-        this._componentsDAO.addNote(new Component(
-                "Empty Name",
-                "Empty",
-                "Enter your specification here!",
-                "Enter your datasheet link here!",
-                100,
-                1
-        ));
-        this._refreshList();
+        try {
+            this._componentsDAO.addNote(new Component(
+                    "Empty Name", "Empty", "Enter your specification here!",
+                    "Enter your datasheet link here!", 100, 1
+            ));
+            this._refreshList();
+        } catch (Exception e) {
+            new ErrorNotifyer("Database Error", "Failed to add empty note", e.getMessage()).apprise();
+        }
     }
 
     @FXML
     public void _onRemoveButtonClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
         if (currentItem == null) { return; }
-        this._componentsDAO.deleteNote(currentItem.getId());
-        this._refreshList();
+        try {
+            this._componentsDAO.deleteNote(currentItem.getId());
+            this._refreshList();
+        } catch (Exception e) {
+            new ErrorNotifyer("Database Error", "Failed to remove component", e.getMessage()).apprise();
+        }
     }
 
     @FXML
     public void onOpenInTableButton() {
         try {
-            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
-                    "/com/monolatte/kontur/ComponentTablePopup.fxml"
-            ));
+            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource("/com/monolatte/kontur/ComponentTablePopup.fxml"));
             Parent root = popupLoader.load();
-
             Stage popupStage = new Stage();
             Scene popupScene = new Scene(root);
-
             popupScene.getStylesheets().add(getClass().getResource("/com/monolatte/style/application.css").toExternalForm());
-
             popupStage.setScene(popupScene);
-
             popupStage.setTitle("Component table");
             popupStage.setResizable(false);
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.showAndWait();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            new ErrorNotifyer("UI Error", "Could not load Component Table", e.getMessage()).apprise();
         }
     }
 
     @FXML
     public void onOpenManufacturerButtonClicked() {
         try {
-            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
-                    "/com/monolatte/kontur/ManufacturersPopup.fxml"
-            ));
+            var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource("/com/monolatte/kontur/ManufacturersPopup.fxml"));
             Parent root = popupLoader.load();
-
             Stage popupStage = new Stage();
             Scene popupScene = new Scene(root);
-
             popupStage.setScene(popupScene);
-
             popupStage.setTitle("Manufacturer window");
             popupStage.setResizable(false);
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.showAndWait();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            new ErrorNotifyer("UI Error", "Could not load Manufacturers window", e.getMessage()).apprise();
         }
     }
 
@@ -153,59 +126,70 @@ public class ComponentsPanelController {
             if (pdfFile.exists()) {
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().open(pdfFile);
-                    System.out.println("Datasheet opened with supported default application\n");
                 } else {
-                    System.err.println("Datasheet can't be opened with current desktop environment\n");
+                    new ErrorNotifyer("System Error", "Desktop not supported", "Cannot open file on this system.").apprise();
                 }
             } else {
-                System.err.printf("Current file on path '%s' cannot be opened. Try to check your file destination\n",
-                        currentItem.getDatasheet_link());
+                new ErrorNotifyer("File Not Found", "Invalid Path", "Path: " + currentItem.getDatasheet_link()).apprise();
             }
-        } catch (IOException e) {
-            System.err.println("An error occurred while trying to open the file");
-        } catch (IllegalArgumentException e) {
-            System.err.println("File could not be opened (e.g., no application registered for PDFs).");
+        } catch (IOException | IllegalArgumentException e) {
+            new ErrorNotifyer("Execution Error", "Failed to open datasheet", e.getMessage()).apprise();
         }
     }
 
     @FXML
     public void _onAddCompButtonClicked() {
-        var currentType = this.typeChoiceBox.getValue();
-        this._componentsDAO.addNote(new Component(
-                this.nameCompTextField.getText(),
-                currentType.getDescription(),
-                this.compInfoTextArea.getText(),
-                this.datasheetPathTextField.getText(),
-                Float.parseFloat(this.costTextField.getText()),
-                Integer.parseInt(this.quantityTextField.getText())
-        ));
-        this._refreshList();
+        try {
+            var currentType = this.typeChoiceBox.getValue();
+            this._componentsDAO.addNote(new Component(
+                    this.nameCompTextField.getText(),
+                    currentType != null ? currentType.getDescription() : "Unknown",
+                    this.compInfoTextArea.getText(),
+                    this.datasheetPathTextField.getText(),
+                    Float.parseFloat(this.costTextField.getText().replace(',', '.')),
+                    Integer.parseInt(this.quantityTextField.getText())
+            ));
+            this._refreshList();
+        } catch (NumberFormatException e) {
+            new ErrorNotifyer("Input Error", "Invalid Number Format", "Check Price and Quantity fields.").apprise();
+        } catch (Exception e) {
+            new ErrorNotifyer("Data Error", "Failed to add component", e.getMessage()).apprise();
+        }
     }
 
     @FXML
     public void _onSaveDataButtonClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
-        var currentType = this.typeChoiceBox.getValue();
         if (currentItem == null) { return; }
+        try {
+            var currentType = this.typeChoiceBox.getValue();
+            currentItem.setName(this.nameCompTextField.getText());
+            currentItem.setType(currentType != null ? currentType.getDescription() : currentItem.getType());
+            currentItem.setSpecification(this.compInfoTextArea.getText());
+            currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
+            currentItem.setPrice(Float.parseFloat(this.costTextField.getText().replace(',', '.')));
+            currentItem.setQuantity(Integer.parseInt(this.quantityTextField.getText()));
 
-        currentItem.setName(this.nameCompTextField.getText());
-        currentItem.setType(currentType.getDescription());
-        currentItem.setSpecification(this.compInfoTextArea.getText());
-        currentItem.setDatasheet_link(this.datasheetPathTextField.getText());
-        currentItem.setPrice(Float.parseFloat(this.costTextField.getText()));
-        currentItem.setQuantity(Integer.parseInt(this.quantityTextField.getText()));
-
-        this._componentsDAO.updateNote(currentItem);
-        this._refreshList();
+            this._componentsDAO.updateNote(currentItem);
+            this._refreshList();
+        } catch (NumberFormatException e) {
+            new ErrorNotifyer("Input Error", "Invalid Number Format", "Check Price and Quantity fields.").apprise();
+        } catch (Exception e) {
+            new ErrorNotifyer("Update Error", "Failed to save changes", e.getMessage()).apprise();
+        }
     }
 
     @FXML
     public void onSearchButtonClicked() {
-        var foundedItems = FXCollections.observableList(this._componentsDAO.search(
-                this.columnSorterChoiceBox.getValue().getDescription(),
-                this.searchTextField.getText()
-        ));
-        this.compList.setItems(foundedItems);
+        try {
+            var description = this.columnSorterChoiceBox.getValue() != null
+                    ? this.columnSorterChoiceBox.getValue().getDescription()
+                    : "";
+            var foundedItems = FXCollections.observableList(this._componentsDAO.search(description, this.searchTextField.getText()));
+            this.compList.setItems(foundedItems);
+        } catch (Exception e) {
+            new ErrorNotifyer("Search Error", "Search failed", e.getMessage()).apprise();
+        }
     }
 
     @FXML
@@ -217,7 +201,6 @@ public class ComponentsPanelController {
     @FXML
     public void onCompListMouseClicked() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
-
         if (currentItem == null) { return; }
         this.idTextField.setText(String.valueOf(currentItem.getId()));
         this.nameCompTextField.setText(currentItem.getName());
@@ -226,7 +209,6 @@ public class ComponentsPanelController {
         this.quantityTextField.setText(String.valueOf(currentItem.getQuantity()));
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());
-
         this._refreshManufacturerList();
     }
 
@@ -235,19 +217,16 @@ public class ComponentsPanelController {
     }
 
     private void _refreshList() {
-        var update = this._updateList();
-        this.compList.setItems(update);
+        this.compList.setItems(this._updateList());
     }
 
     private ObservableList<Manufacturer> _updateManufacturerList() {
         var currentItem = this.compList.getSelectionModel().getSelectedItem();
-        return FXCollections.observableList(this._manufacturerUsageDAO.getManufacturersByComponentId(
-                currentItem.getId()
-        ));
+        if (currentItem == null) return FXCollections.observableArrayList();
+        return FXCollections.observableList(this._manufacturerUsageDAO.getManufacturersByComponentId(currentItem.getId()));
     }
 
     private void _refreshManufacturerList() {
-        var update = this._updateManufacturerList();
-        this.manufacturerListView.setItems(update);
+        this.manufacturerListView.setItems(this._updateManufacturerList());
     }
 }

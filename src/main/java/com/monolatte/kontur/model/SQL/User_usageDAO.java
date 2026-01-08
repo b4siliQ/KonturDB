@@ -25,7 +25,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
                 this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("SQL Error: " + e.getMessage()); }
     }
 
     @Override
@@ -33,7 +33,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         String sqlRequest = String.format("DROP TABLE IF EXISTS %s", this._tableName);
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("SQL Error: " + e.getMessage()); }
     }
 
     @Override
@@ -48,7 +48,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
                     if (genKeys.next()) user_usage.setId(genKeys.getLong(1));
                 }
             }
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("Database error while adding usage: " + e.getMessage()); }
     }
 
     @Override
@@ -57,7 +57,18 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, id);
             pstmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("Database error while deleting note: " + e.getMessage()); }
+    }
+
+    public void removeUserFromProject(long userId, long projectId) {
+        String sqlRequest = String.format("DELETE FROM %s WHERE user_id=? AND project_id=?", this._tableName);
+        try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
+            pstmt.setLong(1, userId);
+            pstmt.setLong(2, projectId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to unpin user from project: " + e.getMessage());
+        }
     }
 
     @Override
@@ -68,7 +79,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
             pstmt.setLong(2, user_usage.getUser_id());
             pstmt.setLong(3, user_usage.getId());
             pstmt.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("Database error while updating usage: " + e.getMessage()); }
     }
 
     @Override
@@ -78,7 +89,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) notes.add(mapResultSetToUserUsage(rs));
-        } catch (SQLException e) { throw new RuntimeException(e.getMessage()); }
+        } catch (SQLException e) { throw new RuntimeException("Fetch error: " + e.getMessage()); }
         return notes;
     }
 
@@ -91,20 +102,18 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
             try(ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) notes.add(mapResultSetToUserUsage(rs));
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) { throw new RuntimeException("Search error: " + e.getMessage()); }
         return notes;
     }
 
     public List<Project> getProjectsByUserId(long userId) {
         List<Project> projects = new ArrayList<>();
-        // Используем INNER JOIN, чтобы найти все проекты, на которых висит этот юзер
         String sqlRequest = String.format(
                 "SELECT p.* FROM Projects p " +
                         "INNER JOIN %s uu ON p.id = uu.project_id " +
                         "WHERE uu.user_id = ?",
                 this._tableName
         );
-
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -118,44 +127,31 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
                     projects.add(project);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка получения проектов юзера: " + e.getMessage());
-        }
+        } catch (SQLException e) { throw new RuntimeException("Error fetching projects: " + e.getMessage()); }
         return projects;
     }
 
     public List<User> getUsersByProjectId(long projectId) {
         List<User> users = new ArrayList<>();
-        // SQL запрос для получения всех пользователей, привязанных к конкретному проекту
         String sqlRequest = String.format(
                 "SELECT u.* FROM Users u " +
                         "INNER JOIN %s uu ON u.id = uu.user_id " +
                         "WHERE uu.project_id = ?",
                 this._tableName
         );
-
         try (PreparedStatement pstmt = this._connect.prepareStatement(sqlRequest)) {
             pstmt.setLong(1, projectId);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    // Создаем объект пользователя из данных БД
-                    User user = new User(
-                            rs.getString("name"),
-                            rs.getString("description"));
-
+                    User user = new User(rs.getString("name"), rs.getString("description"));
                     user.setId(rs.getLong("id"));
                     users.add(user);
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при получении пользователей для проекта: " + e.getMessage(), e);
-        }
-
+        } catch (SQLException e) { throw new RuntimeException("Error fetching users: " + e.getMessage()); }
         return users;
     }
 
-    // --- Твой специальный JOIN (Обновлено: Группировка + Подсчет) ---
     public List<String[]> getUsersAndProjectsJoin() {
         List<String[]> data = new ArrayList<>();
         String sql = "SELECT u.name, 'Проектов: ' || COUNT(uu.project_id) as count_info " +
@@ -167,7 +163,7 @@ public class User_usageDAO implements ISQLDAOSearchable<User_usage> {
             while (rs.next()) {
                 data.add(new String[]{rs.getString("name"), rs.getString("count_info")});
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) { throw new RuntimeException("Join error: " + e.getMessage()); }
         return data;
     }
 
