@@ -106,7 +106,6 @@ public class ManufacturerAdressesDAO implements ISQLDAOSearchable<ManufacturerAd
 
     public List<String[]> getAddressesWithJoinSelection() {
         List<String[]> data = new ArrayList<>();
-        // SQL: JOIN адресов и производителей
         String sql = "SELECT a.city, a.addresses_type, m.name as manufacturer_name " +
                 "FROM " + this._tableName + " a " +
                 "INNER JOIN Manufacturers m ON a.manufacturer_id = m.id";

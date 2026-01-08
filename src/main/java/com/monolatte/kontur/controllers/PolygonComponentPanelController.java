@@ -125,7 +125,6 @@ public class PolygonComponentPanelController {
 
         raw.forEach(c -> props.add(new ComponentProperty(c)));
 
-        // Фильтрация по цене на лету (если введено значение)
         if (!componentCostTextField.getText().isEmpty()) {
             float minPrice = Float.parseFloat(componentCostTextField.getText());
             props.removeIf(p -> p.priceProperty().get() < minPrice);

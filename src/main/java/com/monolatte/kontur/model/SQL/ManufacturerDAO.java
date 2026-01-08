@@ -105,10 +105,6 @@ public class ManufacturerDAO implements ISQLDAOSearchable<Manufacturer> {
 
     public List<String[]> getManufacturersSpecialSelection() {
         List<String[]> data = new ArrayList<>();
-        // Только реальные данные и стандартные SQL функции:
-        // UPPER(name) - название капсом
-        // (name || ' : ' || description) - склейка строк
-        // LENGTH(description) - реальная длина текста описания
         String sql = "SELECT id, " +
                 "UPPER(name) as loud_name, " +
                 "(name || ' — ' || description) as full_info, " +
@@ -121,7 +117,7 @@ public class ManufacturerDAO implements ISQLDAOSearchable<Manufacturer> {
                         rs.getString("id"),
                         rs.getString("loud_name"),
                         rs.getString("full_info"),
-                        rs.getString("desc_length") + " симв." // Добавляем пояснение к числу
+                        rs.getString("desc_length") + " симв."
                 });
             }
         } catch (SQLException e) { throw new RuntimeException(e); }

@@ -22,6 +22,8 @@ public class MainPanelController {
     Tab projectsPolygonTab;
     @FXML
     Tab componentsPolygonTab;
+    @FXML
+    Tab userContactsTab;
 
     @FXML
     public void initialize() {
@@ -103,6 +105,19 @@ public class MainPanelController {
             ));
             Parent subview = aboutPolygonControllerLoader.load();
             this.componentsPolygonTab.setContent(subview);
+        } catch (IOException e) {
+            System.err.println("Alert! An error has occurred while loading user tab");
+            throw new RuntimeException(e);
+        }
+
+        try {
+            FXMLLoader aboutContactsControllerLoader = new FXMLLoader(MainPanelController.class.getResource(
+                    "/com/monolatte/kontur/UserContacts.fxml"
+            ));
+            Parent subview = aboutContactsControllerLoader.load();
+            String cssPath = getClass().getResource("/com/monolatte/style/seregaStyle.css").toExternalForm();
+            subview.getStylesheets().add(cssPath);
+            this.userContactsTab.setContent(subview);
         } catch (IOException e) {
             System.err.println("Alert! An error has occurred while loading user tab");
             throw new RuntimeException(e);
