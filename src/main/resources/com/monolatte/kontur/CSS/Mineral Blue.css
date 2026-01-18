@@ -1,0 +1,61 @@
+.root {
+    -fx-background-color: #f5f6fb;
+    -fx-font-family: "Segoe UI";
+}
+
+.label {
+    -fx-text-fill: #7eadd7;
+}
+
+.button {
+    -fx-background-color: #d1e4f5;
+    -fx-text-fill: #7eadd7;
+    -fx-background-radius: 5 5 5 5;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #bed9f1;
+}
+
+.button:pressed {
+    -fx-background-color: #aacae8;
+}
+
+.button-danger {
+    -fx-background-color: #ffe1e1;
+    -fx-text-fill: #ff6666;
+}
+
+.button-danger:hover {
+    -fx-background-color: #ffc2c2;
+}
+
+.button-danger:pressed {
+    -fx-background-color: #ffa3a3;
+}
+
+.titled-pane {
+    -fx-background-color: transparent;
+}
+
+.titled-pane > .title {
+    -fx-background-color: #f5f6fb;
+    -fx-border-color: #aacae8;
+    -fx-border-width: 0 0 5 0;
+    
+}
+
+.titled-pane > .title > .text {
+    -fx-text-fill: #7eadd7;
+}
+
+.titled-pane-child {
+    -fx-background-color: #f5f6fb;
+}
+
+.titled-pane-child > .title {
+    -fx-background-color: #f5f6fb;
+    -fx-border-color: #aacae8;
+    -fx-border-width: 2 2 2 2;
+}
