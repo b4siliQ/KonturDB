@@ -2,8 +2,8 @@ package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.BaseNote;
 import com.monolatte.kontur.model.Notes.Enums.IColumn;
-import com.monolatte.kontur.model.SQL.DAOFactory;
-import com.monolatte.kontur.model.SQL.ISQLDAOSearchable;
+import com.monolatte.kontur.service.SQL.DAO.DAOFactory;
+import com.monolatte.kontur.service.SQL.Interfaces.ISQLDAOSearchable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

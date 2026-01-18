@@ -1,11 +1,9 @@
 package com.monolatte.kontur.controllers;
 
 import com.monolatte.kontur.model.Notes.Enums.ComponentColumns;
-import com.monolatte.kontur.model.Notes.Manufacturer;
-import com.monolatte.kontur.model.SQL.ComponentsDAO;
+import com.monolatte.kontur.service.SQL.DAO.ComponentsDAO;
 import com.monolatte.kontur.model.Notes.Component;
-import com.monolatte.kontur.model.SQL.Manufacturer_usageDAO;
-import com.monolatte.kontur.model.SQL.SQLTableManager;
+import com.monolatte.kontur.service.SQL.SQLTableManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,45 +22,25 @@ import java.io.File;
 import java.io.IOException;
 
 public class ComponentsPanelController {
-    @FXML
-    ListView<Component> compList;
-    @FXML
-    ListView<Manufacturer> manufacturerListView;
-    @FXML
-    Button addEmptyButton;
-    @FXML
-    Button removeButton;
-    @FXML
-    Button openInTableButton;
-    @FXML
-    Button searchButton;
-    @FXML
-    Button resetSearchButton;
-    @FXML
-    ChoiceBox<ComponentColumns> columnSorterChoiceBox;
-    @FXML
-    TextField searchTextField;
-    @FXML
-    TextField idTextField;
-    @FXML
-    TextField nameCompTextField;
-    @FXML
-    TextField typeTextEdit;
-    @FXML
-    TextField costTextField;
-    @FXML
-    TextArea compInfoTextArea;
-    @FXML
-    TextField datasheetPathTextField;
-    @FXML
-    Button openDatasheetButton;
-    @FXML
-    Button addCompButton;
-    @FXML
-    Button saveDataButton;
+    @FXML ListView<Component> compList;
+    @FXML Button addEmptyButton;
+    @FXML Button removeButton;
+    @FXML Button openInTableButton;
+    @FXML Button searchButton;
+    @FXML Button resetSearchButton;
+    @FXML ChoiceBox<ComponentColumns> columnSorterChoiceBox;
+    @FXML TextField searchTextField;
+    @FXML TextField idTextField;
+    @FXML TextField nameCompTextField;
+    @FXML TextField typeTextEdit;
+    @FXML TextField costTextField;
+    @FXML TextArea compInfoTextArea;
+    @FXML TextField datasheetPathTextField;
+    @FXML Button openDatasheetButton;
+    @FXML Button addCompButton;
+    @FXML Button saveDataButton;
 
     private final ComponentsDAO _componentsDAO = SQLTableManager.getInstance().getComponentsManager();
-    private final Manufacturer_usageDAO _manufacturerUsageDAO = SQLTableManager.getInstance().getManufacturerUsageDAO();
 
     @FXML
     public void initialize() {
@@ -94,7 +72,7 @@ public class ComponentsPanelController {
     public void onOpenInTableButton() {
         try {
             var popupLoader = new FXMLLoader(ComponentsPanelController.class.getResource(
-                    "/com/monolatte/kontur/ComponentTablePopup.fxml"
+                    "/com/monolatte/kontur/FXML/ComponentTablePopup.fxml"
             ));
             Parent root = popupLoader.load();
 
@@ -190,7 +168,6 @@ public class ComponentsPanelController {
         this.compInfoTextArea.setText(currentItem.getSpecification());
         this.datasheetPathTextField.setText(currentItem.getDatasheet_link());
 
-        this._refreshManufacturerList();
     }
 
     private ObservableList<Component> _updateList() {
@@ -200,17 +177,5 @@ public class ComponentsPanelController {
     private void _refreshList() {
         var update = this._updateList();
         this.compList.setItems(update);
-    }
-
-    private ObservableList<Manufacturer> _updateManufacturerList() {
-        var currentItem = this.compList.getSelectionModel().getSelectedItem();
-        return FXCollections.observableList(this._manufacturerUsageDAO.getManufacturersByComponentId(
-                currentItem.getId()
-        ));
-    }
-
-    private void _refreshManufacturerList() {
-        var update = this._updateManufacturerList();
-        this.manufacturerListView.setItems(update);
     }
 }
