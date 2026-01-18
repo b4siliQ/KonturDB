@@ -1,19 +1,18 @@
-package com.monolatte.kontur.model.SQL;
+package com.monolatte.kontur.service.SQL.DAO;
+
+import com.monolatte.kontur.service.SQL.Interfaces.ISQLDAO;
+import com.monolatte.kontur.service.SQL.SQLTableManager;
 
 public class DAOFactory {
 
     public enum DAOType {
-        COMPONENT,
-        PROJECT
+        COMPONENT
     }
 
     public static ISQLDAO<?> createDAO(DAOType type) {
         switch (type) {
             case COMPONENT -> {
                 return SQLTableManager.getInstance().getComponentsManager();
-            }
-            case PROJECT -> {
-                return SQLTableManager.getInstance().getProjectManager();
             }
             default -> throw new IllegalArgumentException(String.format("Unknown DAO type %s", type));
         }

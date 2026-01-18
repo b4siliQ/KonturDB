@@ -1,9 +1,10 @@
-package com.monolatte.kontur.model.SQL;
+package com.monolatte.kontur.service.SQL.DAO;
 
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.monolatte.kontur.model.Notes.Component;
+import com.monolatte.kontur.service.SQL.Interfaces.ISQLDAOSearchable;
 
 public class ComponentsDAO implements ISQLDAOSearchable<Component> {
     final private String _tableName;
