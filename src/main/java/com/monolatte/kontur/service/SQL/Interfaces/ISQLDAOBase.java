@@ -1,4 +1,4 @@
-package com.monolatte.kontur.model.SQL;
+package com.monolatte.kontur.service.SQL.Interfaces;
 
 public interface ISQLDAOBase {
     void createTable();

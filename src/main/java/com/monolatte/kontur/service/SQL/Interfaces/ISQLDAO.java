@@ -1,4 +1,4 @@
-package com.monolatte.kontur.model.SQL;
+package com.monolatte.kontur.service.SQL.Interfaces;
 
 import com.monolatte.kontur.model.Notes.BaseNote;
 
